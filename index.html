@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NMS · Refinería</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
+  :root {
+    --bg:     #050c14;
+    --panel:  #0a1828;
+    --border: #0e3a52;
+    --gold:   #f0c040;
+    --cyan:   #00d4ff;
+    --cyan2:  #00ffcc;
+    --green:  #39d353;
+    --red:    #ff4466;
+    --white:  #ddeeff;
+    --grey:   #4a6a80;
+    --glow:   0 0 18px #00d4ff55;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--white); font-family:'Exo 2',sans-serif; min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse at 20% 30%,#001a2e88 0%,transparent 60%), radial-gradient(ellipse at 80% 70%,#001a1488 0%,transparent 60%); pointer-events:none; }
+  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; background-image: radial-gradient(1px 1px at 10% 15%,#ffffff44,transparent), radial-gradient(1px 1px at 25% 45%,#ffffff33,transparent), radial-gradient(1px 1px at 50% 10%,#ffffff55,transparent), radial-gradient(1px 1px at 70% 60%,#ffffff33,transparent), radial-gradient(1px 1px at 85% 25%,#ffffff44,transparent), radial-gradient(1px 1px at 35% 80%,#ffffff22,transparent), radial-gradient(1px 1px at 60% 90%,#ffffff33,transparent); }
+  .wrap { position:relative; z-index:1; max-width:920px; margin:0 auto; padding:2rem 1.2rem 4rem; }
+  header { text-align:center; margin-bottom:2.5rem; }
+  header h1 { font-family:'Orbitron',monospace; font-size:clamp(1.6rem,5vw,2.6rem); font-weight:900; color:var(--gold); letter-spacing:.15em; text-shadow:0 0 30px #f0c04066,0 0 60px #f0c04033; line-height:1.1; }
+  header p { font-family:'Share Tech Mono',monospace; color:var(--cyan); font-size:.8rem; letter-spacing:.2em; margin-top:.5rem; opacity:.8; }
+  .line-dec { width:60%; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); margin:1rem auto; box-shadow:var(--glow); }
+  .search-wrap { position:relative; margin-bottom:2rem; }
+  .search-wrap input { width:100%; padding:1rem 1.4rem 1rem 3.2rem; background:var(--panel); border:1.5px solid var(--border); border-radius:6px; color:var(--white); font-family:'Exo 2',sans-serif; font-size:1.1rem; outline:none; transition:border-color .3s,box-shadow .3s; }
+  .search-wrap input:focus { border-color:var(--cyan); box-shadow:var(--glow); }
+  .search-wrap input::placeholder { color:var(--grey); }
+  .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--cyan); font-size:1.2rem; pointer-events:none; }
+  .clear-btn { position:absolute; right:.8rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--grey); font-size:1.2rem; cursor:pointer; display:none; padding:.2rem .4rem; transition:color .2s; }
+  .clear-btn:hover { color:var(--red); }
+  .autocomplete { position:absolute; top:100%; left:0; right:0; z-index:100; background:var(--panel); border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; max-height:240px; overflow-y:auto; display:none; box-shadow:0 8px 32px #000a; }
+  .autocomplete.show { display:block; }
+  .autocomplete-item { padding:.65rem 1.2rem; cursor:pointer; font-size:.95rem; border-bottom:1px solid var(--border); transition:background .15s; }
+  .autocomplete-item:last-child { border-bottom:none; }
+  .autocomplete-item:hover,.autocomplete-item.active { background:#0e2a3a; color:var(--cyan); }
+  .results-header { font-family:'Share Tech Mono',monospace; font-size:.75rem; color:var(--grey); letter-spacing:.15em; text-transform:uppercase; margin-bottom:1rem; display:none; }
+  .results-header span { color:var(--cyan); }
+  .recipe-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:1.2rem 1.4rem; margin-bottom:1rem; position:relative; overflow:hidden; animation:fadeIn .3s ease; transition:border-color .2s,box-shadow .2s; }
+  .recipe-card:hover { border-color:var(--cyan); box-shadow:var(--glow); }
+  .recipe-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--cyan),var(--cyan2)); opacity:.6; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .recipe-row { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; }
+  .ingredient { display:flex; flex-direction:column; align-items:center; background:#0d2035; border:1px solid var(--border); border-radius:6px; padding:.5rem .9rem; min-width:100px; }
+  .ingredient .iname { font-weight:600; font-size:.88rem; color:var(--white); text-align:center; line-height:1.3; }
+  .ingredient .qty { font-family:'Share Tech Mono',monospace; font-size:.75rem; color:var(--gold); margin-top:.15rem; }
+  .ingredient.result { background:#0a2010; border-color:#39d35366; }
+  .ingredient.result .iname { color:var(--green); }
+  .ingredient.result .qty { color:var(--cyan2); }
+  .arrow { font-size:1.4rem; color:var(--gold); font-weight:bold; flex-shrink:0; }
+  .plus { font-size:1.1rem; color:var(--grey); flex-shrink:0; }
+  .refinery-badge { margin-left:auto; font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25rem .6rem; border-radius:4px; border:1px solid var(--border); color:var(--grey); white-space:nowrap; flex-shrink:0; }
+  .refinery-badge.grande { border-color:#9b59b655; color:#c39bd3; }
+  .refinery-badge.media  { border-color:#f0c04055; color:var(--gold); }
+  .refinery-badge.todas  { border-color:#00d4ff33; color:var(--cyan); }
+  .no-results { text-align:center; padding:3rem 1rem; color:var(--grey); font-family:'Share Tech Mono',monospace; font-size:.9rem; }
+  .no-results .icon { font-size:2.5rem; margin-bottom:.8rem; display:block; }
+  .hint { text-align:center; padding:4rem 1rem; color:var(--grey); font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.08em; line-height:2.2; }
+  .hint .big { font-size:3rem; display:block; margin-bottom:1rem; }
+  .hint em { color:var(--cyan); font-style:normal; }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="wrap">
+  <header>
+    <h1>NMS · REFINERÍA</h1>
+    <div class="line-dec"></div>
+    <p>// BUSCADOR INVERSO · ESCRIBE LO QUE QUIERES OBTENER //</p>
+  </header>
+  <div class="search-wrap">
+    <span class="search-icon">⬡</span>
+    <input type="text" id="search" placeholder="¿Qué quieres obtener? Ej: Metal cromático, Ferrita imantada, Nanitos..." autocomplete="off" spellcheck="false">
+    <button class="clear-btn" id="clearBtn">✕</button>
+    <div class="autocomplete" id="autocomplete"></div>
+  </div>
+  <div id="resultsHeader" class="results-header"></div>
+  <div id="results"></div>
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════
+// RECETAS — NOMBRES OFICIALES EN ESPAÑOL (NMS Wiki ES)
+// i1/q1=ingrediente1/cantidad, i2/q2, i3/q3, r=resultado, qr=cantidad resultado, ref=refinadora
+// ═══════════════════════════════════════════════════════════
+const R=[
+  // CARBONO / CARBONO CONDENSADO
+  {i1:"Carbono condensado",q1:1,r:"Carbono",qr:2,ref:"Todas"},
+  {i1:"Carbono",q1:1,r:"Carbono condensado",qr:1,ref:"Todas"},
+  {i1:"Carbono",q1:2,r:"Carbono condensado",qr:1,ref:"Todas"},
+  {i1:"Carne de cactus",q1:1,r:"Carbono",qr:2,ref:"Todas"},
+  {i1:"Raíz gamma",q1:1,r:"Carbono",qr:2,ref:"Todas"},
+  {i1:"Moho fúngico",q1:1,r:"Carbono",qr:2,ref:"Todas"},
+  {i1:"Oxígeno",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Solanio",q1:1,r:"Carbono",qr:2,ref:"Todas"},
+  {i1:"Mordita",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Bulbo de médula",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Dioxita",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Pirita",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Parafinio",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Amoníaco",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Fósforo",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Hecesio",q1:1,r:"Carbono",qr:1,ref:"Todas"},
+  {i1:"Metano",q1:1,r:"Carbono condensado",qr:1,ref:"Todas"},
+  {i1:"Gas de incineración",q1:1,r:"Carbono condensado",qr:2,ref:"Todas"},
+  {i1:"Carbono",q1:2,i2:"Oxígeno",q2:2,r:"Carbono condensado",qr:5,ref:"Todas"},
+  {i1:"Carbono condensado",q1:1,i2:"Oxígeno",q2:2,r:"Carbono condensado",qr:6,ref:"Todas"},
+  {i1:"Metano",q1:1,i2:"Carbono",q2:1,r:"Carbono condensado",qr:3,ref:"Todas"},
+  {i1:"Coprita",q1:1,i2:"Carbono condensado",q2:1,r:"Carbono condensado",qr:3,ref:"Todas"},
+  // OXÍGENO
+  {i1:"Radón",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
+  {i1:"Sulfurina",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
+  {i1:"Metano",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
+  {i1:"Amoníaco",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
+  {i1:"Saco de algas",q1:1,i2:"Carbono",q2:1,r:"Oxígeno",qr:2,ref:"Todas"},
+  {i1:"Saco de algas",q1:1,i2:"Carbono condensado",q2:1,r:"Oxígeno",qr:2,ref:"Todas"},
+  // POLVO DE FERRITA
+  {i1:"Ferrita pura",q1:1,i2:"Oxígeno",q2:1,r:"Polvo de ferrita",qr:4,ref:"Todas"},
+  {i1:"Ferrita imantada",q1:1,r:"Polvo de ferrita",qr:1,ref:"Todas"},
+  // FERRITA PURA
+  {i1:"Polvo de ferrita",q1:1,r:"Ferrita pura",qr:1,ref:"Todas"},
+  {i1:"Ferrita imantada",q1:1,r:"Ferrita pura",qr:2,ref:"Todas"},
+  {i1:"Pirita",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
+  {i1:"Amoníaco",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
+  {i1:"Gas de incineración",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
+  // FERRITA IMANTADA
+  {i1:"Ferrita pura",q1:1,r:"Ferrita imantada",qr:1,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Carbono",q2:1,r:"Ferrita imantada",qr:1,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Carbono condensado",q2:1,r:"Ferrita imantada",qr:2,ref:"Todas"},
+  {i1:"Ferrita pura",q1:1,i2:"Carbono",q2:1,r:"Ferrita imantada",qr:2,ref:"Todas"},
+  {i1:"Ferrita pura",q1:1,i2:"Carbono condensado",q2:1,r:"Ferrita imantada",qr:3,ref:"Todas"},
+  {i1:"Platino",q1:1,i2:"Oxígeno",q2:1,r:"Ferrita imantada",qr:10,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Plata",q3:1,r:"Ferrita imantada",qr:5,ref:"Grande"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Oro",q3:1,r:"Ferrita imantada",qr:8,ref:"Grande"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Platino",q3:1,r:"Ferrita imantada",qr:12,ref:"Grande"},
+  // DIHIDRÓGENO / GRASA DE DIHIDRÓGENO
+  {i1:"Tritio",q1:5,r:"Dihidrógeno",qr:1,ref:"Todas"},
+  {i1:"Grasa de dihidrógeno",q1:1,r:"Dihidrógeno",qr:40,ref:"Todas"},
+  {i1:"Residuo aceitoso",q1:1,r:"Dihidrógeno",qr:20,ref:"Todas"},
+  {i1:"Dihidrógeno",q1:30,r:"Grasa de dihidrógeno",qr:1,ref:"Todas"},
+  {i1:"Dihidrógeno",q1:50,i2:"Polvo de ferrita",q2:1,r:"Grasa de dihidrógeno",qr:1,ref:"Todas"},
+  // DEUTERIO
+  {i1:"Dihidrógeno",q1:1,i2:"Polvo de ferrita",q2:1,r:"Deuterio",qr:1,ref:"Media/Grande"},
+  {i1:"Dihidrógeno",q1:1,i2:"Ferrita pura",q2:1,r:"Deuterio",qr:1,ref:"Media/Grande"},
+  // SODIO / NITRATO DE SODIO
+  {i1:"Nitrato de sodio",q1:1,r:"Sodio",qr:2,ref:"Todas"},
+  {i1:"Bulbo de médula",q1:1,r:"Sodio",qr:1,ref:"Todas"},
+  {i1:"Bulbo de médula",q1:1,i2:"Carbono",q2:1,r:"Sodio",qr:2,ref:"Todas"},
+  {i1:"Bulbo de médula",q1:1,i2:"Carbono condensado",q2:1,r:"Sodio",qr:2,ref:"Todas"},
+  {i1:"Sodio",q1:2,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Sodio",q1:1,i2:"Carbono",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Sodio",q1:1,i2:"Carbono condensado",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
+  {i1:"Sodio",q1:1,i2:"Oxígeno",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Nitrato de sodio",q1:1,i2:"Oxígeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
+  {i1:"Sodio",q1:1,i2:"Púgneo",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Nitrato de sodio",q1:1,i2:"Púgneo",q2:1,r:"Nitrato de sodio",qr:3,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,i2:"Sodio",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,i2:"Polvo de ferrita",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
+  {i1:"Ferrita pura",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
+  {i1:"Ferrita imantada",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:3,ref:"Todas"},
+  {i1:"Nitrato de sodio",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
+  {i1:"Carbono condensado",q1:1,i2:"Sodio",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
+  {i1:"Cristal de sulfuro",q1:1,r:"Nitrato de sodio",qr:50,ref:"Todas"},
+  // SAL / CLORO
+  {i1:"Cloro",q1:1,r:"Sal",qr:2,ref:"Todas"},
+  {i1:"Dihidrógeno",q1:1,i2:"Oxígeno",q2:1,r:"Sal",qr:1,ref:"Todas"},
+  {i1:"Sal",q1:1,r:"Cloro",qr:1,ref:"Todas"},
+  {i1:"Sal",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Cloro",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:6,ref:"Todas"},
+  {i1:"Saco de algas",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Radón",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Sulfurina",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Amoníaco",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
+  {i1:"Sal",q1:1,i2:"Cloro",q2:1,i3:"Oxígeno",q3:1,r:"Cloro",qr:10,ref:"Grande"},
+  // COBALTO / COBALTO IONIZADO
+  {i1:"Cobalto ionizado",q1:1,r:"Cobalto",qr:2,ref:"Todas"},
+  {i1:"Cobalto",q1:2,r:"Cobalto ionizado",qr:1,ref:"Todas"},
+  {i1:"Cobalto",q1:1,i2:"Oxígeno",q2:1,r:"Cobalto ionizado",qr:1,ref:"Todas"},
+  {i1:"Cobalto ionizado",q1:1,i2:"Oxígeno",q2:2,r:"Cobalto ionizado",qr:6,ref:"Todas"},
+  {i1:"Bulbo de médula",q1:1,i2:"Púgneo",q2:1,r:"Cobalto ionizado",qr:1,ref:"Todas"},
+  {i1:"Mordita",q1:1,i2:"Nitrato de sodio",q2:1,r:"Cobalto ionizado",qr:4,ref:"Todas"},
+  // METAL CROMÁTICO
+  {i1:"Cobre",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Cadmio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Emerilio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Indio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Cobre activado",q1:1,r:"Metal cromático",qr:2,ref:"Todas"},
+  {i1:"Cadmio activado",q1:1,r:"Metal cromático",qr:2,ref:"Todas"},
+  {i1:"Emerilio activado",q1:1,r:"Metal cromático",qr:2,ref:"Todas"},
+  {i1:"Indio activado",q1:1,r:"Metal cromático",qr:2,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Oxígeno",q2:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Ferrita pura",q1:1,i2:"Oxígeno",q2:1,r:"Metal cromático",qr:2,ref:"Todas"},
+  {i1:"Solanio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
+  {i1:"Solanio",q1:2,i2:"Cobalto",q2:1,r:"Metal cromático",qr:3,ref:"Todas"},
+  // COBRE / CADMIO / EMERILIO / INDIO (ciclos de multiplicación)
+  {i1:"Cobre",q1:1,i2:"Metal cromático",q2:1,r:"Cobre",qr:2,ref:"Todas"},
+  {i1:"Cadmio",q1:1,i2:"Metal cromático",q2:1,r:"Cadmio",qr:2,ref:"Todas"},
+  {i1:"Emerilio",q1:1,i2:"Metal cromático",q2:1,r:"Emerilio",qr:2,ref:"Todas"},
+  {i1:"Indio",q1:1,i2:"Metal cromático",q2:1,r:"Indio",qr:2,ref:"Todas"},
+  // PLATA / ORO / PLATINO
+  {i1:"Oro",q1:1,r:"Plata",qr:2,ref:"Todas"},
+  {i1:"Plata",q1:1,i2:"Oxígeno",q2:1,r:"Parafinio",qr:2,ref:"Todas"},
+  {i1:"Platino",q1:1,r:"Oro",qr:2,ref:"Todas"},
+  {i1:"Oro",q1:1,i2:"Oxígeno",q2:1,r:"Pirita",qr:2,ref:"Todas"},
+  {i1:"Plata",q1:1,i2:"Oro",q2:1,r:"Platino",qr:1,ref:"Todas"},
+  {i1:"Geodesita",q1:1,r:"Platino",qr:1,ref:"Todas"},
+  {i1:"Iridesita",q1:1,r:"Platino",qr:1,ref:"Todas"},
+  {i1:"Lemio",q1:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Oro magno",q1:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Perla viva",q1:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Grantino",q1:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Mordita",q1:1,i2:"Púgneo",q2:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Hecesio",q1:1,i2:"Pringue residual",q2:1,r:"Oro",qr:1,ref:"Todas"},
+  {i1:"Aronio",q1:1,r:"Plata",qr:1,ref:"Todas"},
+  {i1:"Bronce oscuro",q1:1,r:"Plata",qr:1,ref:"Todas"},
+  {i1:"Henox",q1:1,r:"Plata",qr:1,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Oxígeno",q2:1,i3:"Emerilio",q3:1,r:"Oro",qr:10,ref:"Grande"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Oxígeno",q2:1,i3:"Emerilio",q3:1,r:"Platino",qr:10,ref:"Grande"},
+  // GASES ATMOSFÉRICOS
+  {i1:"Radón",q1:1,i2:"Oxígeno",q2:1,r:"Nitrógeno",qr:1,ref:"Todas"},
+  {i1:"Radón",q1:1,i2:"Metal cromático",q2:1,r:"Nitrógeno",qr:1,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,i2:"Oxígeno",q2:1,r:"Sulfurina",qr:1,ref:"Todas"},
+  {i1:"Nitrógeno",q1:1,i2:"Metal cromático",q2:1,r:"Sulfurina",qr:1,ref:"Todas"},
+  {i1:"Sulfurina",q1:1,i2:"Oxígeno",q2:1,r:"Radón",qr:1,ref:"Todas"},
+  {i1:"Sulfurina",q1:1,i2:"Metal cromático",q2:1,r:"Radón",qr:1,ref:"Todas"},
+  {i1:"Azufre",q1:1,i2:"Metal cromático",q2:1,r:"Radón",qr:1,ref:"Todas"},
+  // AMONÍACO
+  {i1:"Nitrógeno",q1:1,i2:"Dihidrógeno",q2:1,r:"Amoníaco",qr:1,ref:"Media/Grande"},
+  {i1:"Parafinio",q1:2,i2:"Polvo de ferrita",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
+  {i1:"Parafinio",q1:1,i2:"Ferrita pura",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
+  {i1:"Moho fúngico",q1:2,i2:"Sal",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
+  // PIRITA
+  {i1:"Oro",q1:1,r:"Pirita",qr:2,ref:"Todas"},
+  {i1:"Oro",q1:1,i2:"Oxígeno",q2:1,r:"Pirita",qr:2,ref:"Todas"},
+  {i1:"Carne de cactus",q1:1,i2:"Sal",q2:1,r:"Pirita",qr:1,ref:"Todas"},
+  {i1:"Uranio",q1:1,i2:"Polvo de ferrita",q2:1,r:"Pirita",qr:1,ref:"Todas"},
+  // PARAFINIO
+  {i1:"Pirita",q1:1,i2:"Polvo de ferrita",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
+  {i1:"Sulfurina",q1:1,i2:"Polvo de ferrita",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
+  {i1:"Bulbo estelar",q1:1,i2:"Sal",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
+  {i1:"Plata",q1:1,i2:"Oxígeno",q2:1,r:"Parafinio",qr:2,ref:"Todas"},
+  // DIOXITA
+  {i1:"Amoníaco",q1:1,i2:"Polvo de ferrita",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
+  {i1:"Carbono",q1:1,i2:"Nitrato de sodio",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
+  {i1:"Carbono condensado",q1:1,i2:"Nitrato de sodio",q2:1,r:"Dioxita",qr:2,ref:"Todas"},
+  {i1:"Cristal de escarcha",q1:1,i2:"Sal",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
+  // URANIO
+  {i1:"Radón",q1:1,i2:"Dihidrógeno",q2:1,r:"Uranio",qr:1,ref:"Todas"},
+  {i1:"Fósforo",q1:2,i2:"Polvo de ferrita",q2:1,r:"Uranio",qr:1,ref:"Todas"},
+  {i1:"Fósforo",q1:2,i2:"Ferrita pura",q2:1,r:"Uranio",qr:1,ref:"Todas"},
+  {i1:"Raíz gamma",q1:2,i2:"Sal",q2:1,r:"Uranio",qr:1,ref:"Todas"},
+  {i1:"Polvo de ferrita",q1:1,i2:"Radón",q2:1,r:"Uranio",qr:1,ref:"Todas"},
+  {i1:"Radón",q1:1,i2:"Ferrita pura",q2:1,r:"Uranio",qr:2,ref:"Todas"},
+  {i1:"Radón",q1:1,i2:"Ferrita imantada",q2:1,r:"Uranio",qr:3,ref:"Todas"},
+  // FÓSFORO
+  {i1:"Uranio",q1:1,i2:"Polvo de ferrita",q2:2,r:"Fósforo",qr:1,ref:"Todas"},
+  // MORDITA
+  {i1:"Dihidrógeno",q1:1,i2:"Carbono condensado",q2:1,r:"Mordita",qr:1,ref:"Todas"},
+  {i1:"Carbono",q1:1,i2:"Moho fúngico",q2:1,r:"Mordita",qr:1,ref:"Todas"},
+  {i1:"Carbono condensado",q1:1,i2:"Moho fúngico",q2:1,r:"Mordita",qr:2,ref:"Todas"},
+  {i1:"Coprita",q1:3,r:"Mordita",qr:2,ref:"Todas"},
+  // BULBO DE MÉDULA
+  {i1:"Mordita",q1:1,i2:"Sodio",q2:2,r:"Bulbo de médula",qr:3,ref:"Todas"},
+  {i1:"Mordita",q1:1,i2:"Nitrato de sodio",q2:1,r:"Bulbo de médula",qr:4,ref:"Todas"},
+  {i1:"Cobalto",q1:1,i2:"Nitrógeno",q2:1,r:"Bulbo de médula",qr:1,ref:"Todas"},
+  // MOHO FÚNGICO
+  {i1:"Amoníaco",q1:1,i2:"Nitrógeno",q2:1,r:"Moho fúngico",qr:1,ref:"Todas"},
+  // HECESIO
+  {i1:"Nitrógeno",q1:1,i2:"Sulfurina",q2:1,r:"Hecesio",qr:1,ref:"Todas"},
+  // CARNE DE CACTUS
+  {i1:"Pirita",q1:2,i2:"Oxígeno",q2:1,r:"Carne de cactus",qr:1,ref:"Todas"},
+  {i1:"Pirita",q1:2,i2:"Azufre",q2:1,r:"Carne de cactus",qr:1,ref:"Todas"},
+  {i1:"Pirita",q1:1,i2:"Carne de cactus",q2:1,r:"Carne de cactus",qr:2,ref:"Todas"},
+  // RAÍZ GAMMA / POLVO DE GAMMA
+  {i1:"Polvo de gamma",q1:2,r:"Raíz gamma",qr:1,ref:"Todas"},
+  {i1:"Raíz gamma",q1:1,r:"Polvo de gamma",qr:2,ref:"Todas"},
+  // POLVO DE GRAVITINO
+  {i1:"Faecio",q1:1,r:"Polvo de gravitino",qr:1,ref:"Todas"},
+  // NANITOS
+  {i1:"Polvo de gravitino",q1:1,r:"Nanitos",qr:50,ref:"Todas"},
+  {i1:"Huevo de larva",q1:1,r:"Nanitos",qr:65,ref:"Todas"},
+  {i1:"Residuo tóxico",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Gas nocivo",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Residuo aceitoso",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Unidad de mapeo autónomo",q1:1,r:"Nanitos",qr:80,ref:"Todas"},
+  {i1:"Conducto neural",q1:1,r:"Nanitos",qr:50,ref:"Todas"},
+  {i1:"Residuo acuoso",q1:1,r:"Nanitos",qr:25,ref:"Todas"},
+  {i1:"Légamo solidificado",q1:1,r:"Nanitos",qr:30,ref:"Todas"},
+  {i1:"Cristal de silicato",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Cristal de ferrocos",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Cristal de solanas",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Cristal de ruinas",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
+  {i1:"Faecio",q1:1,i2:"Hexita",q2:1,r:"Nanitos",qr:1,ref:"Todas"},
+  // GAS DE INCINERACIÓN
+  {i1:"Oxígeno",q1:1,i2:"Carbono",q2:1,r:"Gas de incineración",qr:2,ref:"Todas"},
+  {i1:"Oxígeno",q1:2,i2:"Carbono",q2:1,r:"Gas de incineración",qr:3,ref:"Todas"},
+  // POLVO DE SILICATO / VIDRIO
+  {i1:"Vidrio",q1:1,r:"Polvo de silicato",qr:2,ref:"Todas"},
+  {i1:"Polvo de silicato",q1:2,r:"Vidrio",qr:1,ref:"Todas"},
+  {i1:"Polvo de silicato",q1:1,i2:"Carbono",q2:1,r:"Vidrio",qr:1,ref:"Todas"},
+  // AZUFRE
+  {i1:"Dioxita",q1:2,r:"Azufre",qr:1,ref:"Todas"},
+  {i1:"Pirita",q1:2,r:"Azufre",qr:1,ref:"Todas"},
+  // ALEACIONES AVANZADAS (refinadora grande)
+  {i1:"Parafinio",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Tritio",q3:30,r:"Aronio",qr:1,ref:"Grande"},
+  {i1:"Parafinio",q1:30,i2:"Cobalto",q2:60,i3:"Oro",q3:10,r:"Aronio",qr:1,ref:"Grande"},
+  {i1:"Pirita",q1:30,i2:"Ferrita pura",q2:60,i3:"Oro",q3:10,r:"Bronce oscuro",qr:1,ref:"Grande"},
+  {i1:"Amoníaco",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Plata",q3:20,r:"Gerox",qr:1,ref:"Grande"},
+  {i1:"Dioxita",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Oro",q3:10,r:"Lemmio",qr:1,ref:"Grande"},
+  {i1:"Uranio",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Platino",q3:5,r:"Grantino",qr:1,ref:"Grande"},
+  {i1:"Fósforo",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Plata",q3:20,r:"Henox",qr:1,ref:"Grande"},
+  {i1:"Carbono condensado",q1:25,i2:"Nitrato de sodio",q2:5,i3:"Metal cromático",q3:250,r:"Célula de curvatura",qr:1,ref:"Grande"},
+  {i1:"Carbono",q1:50,i2:"Nitrato de sodio",q2:5,i3:"Metal cromático",q3:250,r:"Célula de curvatura",qr:1,ref:"Grande"},
+  {i1:"Polvo de ferrita",q1:10,i2:"Plata",q2:10,i3:"Sodio",q3:10,r:"Batería de iones",qr:1,ref:"Grande"},
+];
+
+// ═══════════════════════════════════════════════════════════
+// ÍNDICE
+// ═══════════════════════════════════════════════════════════
+const allNames=new Set();
+R.forEach(r=>{allNames.add(r.r);allNames.add(r.i1);if(r.i2)allNames.add(r.i2);if(r.i3)allNames.add(r.i3);});
+const RESOURCES=[...allNames].sort((a,b)=>a.localeCompare(b,'es'));
+
+// DOM
+const searchEl=document.getElementById('search');
+const clearBtn=document.getElementById('clearBtn');
+const autoEl=document.getElementById('autocomplete');
+const resultsEl=document.getElementById('results');
+const hdrEl=document.getElementById('resultsHeader');
+let acIdx=-1;
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+function sugg(q){return !q?[]:RESOURCES.filter(r=>norm(r).includes(norm(q))).slice(0,12);}
+
+function renderAC(list){
+  if(!list.length){autoEl.classList.remove('show');return;}
+  autoEl.innerHTML=list.map(s=>`<div class="autocomplete-item" data-v="${s}">${s}</div>`).join('');
+  autoEl.classList.add('show');acIdx=-1;
+}
+
+function refCls(r){if(!r||r==="Todas")return"todas";if(r.includes("Grande"))return"grande";return"media";}
+
+function chip(name,qty,isRes=false){
+  return`<div class="ingredient${isRes?' result':''}"><span class="iname">${name}</span><span class="qty">×${qty}</span></div>`;
+}
+
+function doSearch(query){
+  if(!query){resultsEl.innerHTML='';hdrEl.style.display='none';showHint();return;}
+  const nq=norm(query);
+  const found=R.filter(r=>norm(r.r).includes(nq));
+  hdrEl.style.display='block';
+  if(!found.length){
+    hdrEl.innerHTML=`Sin resultados para <span>"${query}"</span>`;
+    resultsEl.innerHTML=`<div class="no-results"><span class="icon">⬡</span>No hay recetas para obtener "<strong>${query}</strong>".<br>Verifica la ortografía o prueba con un nombre parcial.</div>`;
+    return;
+  }
+  hdrEl.innerHTML=`<span>${found.length}</span> receta${found.length>1?'s':''} para obtener <span>"${found[0].r}"</span>`;
+  resultsEl.innerHTML=found.map(r=>{
+    const i2=r.i2?`<span class="plus">+</span>${chip(r.i2,r.q2)}`:'';
+    const i3=r.i3?`<span class="plus">+</span>${chip(r.i3,r.q3)}`:'';
+    return`<div class="recipe-card"><div class="recipe-row">${chip(r.i1,r.q1)}${i2}${i3}<span class="arrow">→</span>${chip(r.r,r.qr,true)}<span class="refinery-badge ${refCls(r.ref)}">${r.ref||'Todas'}</span></div></div>`;
+  }).join('');
+}
+
+function showHint(){
+  resultsEl.innerHTML=`<div class="hint"><span class="big">⬡</span>Escribe el nombre de cualquier recurso<br>para ver <em>todas las formas de obtenerlo</em><br>en la refinería.<br><br><em>Ej: Ferrita imantada · Metal cromático · Nanitos · Cloro · Nitrato de sodio</em></div>`;
+}
+showHint();
+
+searchEl.addEventListener('input',()=>{
+  const q=searchEl.value.trim();
+  clearBtn.style.display=q?'block':'none';
+  renderAC(sugg(q));
+  if(!q){showHint();hdrEl.style.display='none';return;}
+  doSearch(q);
+});
+searchEl.addEventListener('keydown',e=>{
+  const items=autoEl.querySelectorAll('.autocomplete-item');
+  if(e.key==='ArrowDown'){acIdx=Math.min(acIdx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===acIdx));}
+  else if(e.key==='ArrowUp'){acIdx=Math.max(acIdx-1,-1);items.forEach((el,i)=>el.classList.toggle('active',i===acIdx));}
+  else if(e.key==='Enter'&&acIdx>=0&&items[acIdx]){const v=items[acIdx].dataset.v;searchEl.value=v;autoEl.classList.remove('show');doSearch(v);clearBtn.style.display='block';}
+  else if(e.key==='Escape'){autoEl.classList.remove('show');}
+});
+autoEl.addEventListener('click',e=>{
+  const item=e.target.closest('.autocomplete-item');
+  if(!item)return;
+  searchEl.value=item.dataset.v;autoEl.classList.remove('show');doSearch(item.dataset.v);clearBtn.style.display='block';
+});
+clearBtn.addEventListener('click',()=>{searchEl.value='';clearBtn.style.display='none';autoEl.classList.remove('show');showHint();hdrEl.style.display='none';searchEl.focus();});
+document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))autoEl.classList.remove('show');});
+</script>
+</body>
+</html>
