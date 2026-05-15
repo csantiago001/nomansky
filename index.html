@@ -3,99 +3,744 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NMS · Refinería</title>
+<title>No Man's Sky · Guía Galáctica Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap');
-  :root {
-    --bg:     #050c14;
-    --panel:  #0a1828;
-    --border: #0e3a52;
-    --gold:   #f0c040;
-    --cyan:   #00d4ff;
-    --cyan2:  #00ffcc;
-    --green:  #39d353;
-    --red:    #ff4466;
-    --white:  #ddeeff;
-    --grey:   #4a6a80;
-    --glow:   0 0 18px #00d4ff55;
-  }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:var(--bg); color:var(--white); font-family:'Exo 2',sans-serif; min-height:100vh; overflow-x:hidden; }
-  body::before { content:''; position:fixed; inset:0; z-index:0; background: radial-gradient(ellipse at 20% 30%,#001a2e88 0%,transparent 60%), radial-gradient(ellipse at 80% 70%,#001a1488 0%,transparent 60%); pointer-events:none; }
-  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; background-image: radial-gradient(1px 1px at 10% 15%,#ffffff44,transparent), radial-gradient(1px 1px at 25% 45%,#ffffff33,transparent), radial-gradient(1px 1px at 50% 10%,#ffffff55,transparent), radial-gradient(1px 1px at 70% 60%,#ffffff33,transparent), radial-gradient(1px 1px at 85% 25%,#ffffff44,transparent), radial-gradient(1px 1px at 35% 80%,#ffffff22,transparent), radial-gradient(1px 1px at 60% 90%,#ffffff33,transparent); }
-  .wrap { position:relative; z-index:1; max-width:920px; margin:0 auto; padding:2rem 1.2rem 4rem; }
-  header { text-align:center; margin-bottom:2.5rem; }
-  header h1 { font-family:'Orbitron',monospace; font-size:clamp(1.6rem,5vw,2.6rem); font-weight:900; color:var(--gold); letter-spacing:.15em; text-shadow:0 0 30px #f0c04066,0 0 60px #f0c04033; line-height:1.1; }
-  header p { font-family:'Share Tech Mono',monospace; color:var(--cyan); font-size:.8rem; letter-spacing:.2em; margin-top:.5rem; opacity:.8; }
-  .line-dec { width:60%; height:1px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); margin:1rem auto; box-shadow:var(--glow); }
-  .search-wrap { position:relative; margin-bottom:2rem; }
-  .search-wrap input { width:100%; padding:1rem 1.4rem 1rem 3.2rem; background:var(--panel); border:1.5px solid var(--border); border-radius:6px; color:var(--white); font-family:'Exo 2',sans-serif; font-size:1.1rem; outline:none; transition:border-color .3s,box-shadow .3s; }
-  .search-wrap input:focus { border-color:var(--cyan); box-shadow:var(--glow); }
-  .search-wrap input::placeholder { color:var(--grey); }
-  .search-icon { position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--cyan); font-size:1.2rem; pointer-events:none; }
-  .clear-btn { position:absolute; right:.8rem; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--grey); font-size:1.2rem; cursor:pointer; display:none; padding:.2rem .4rem; transition:color .2s; }
-  .clear-btn:hover { color:var(--red); }
-  .autocomplete { position:absolute; top:100%; left:0; right:0; z-index:100; background:var(--panel); border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; max-height:240px; overflow-y:auto; display:none; box-shadow:0 8px 32px #000a; }
-  .autocomplete.show { display:block; }
-  .autocomplete-item { padding:.65rem 1.2rem; cursor:pointer; font-size:.95rem; border-bottom:1px solid var(--border); transition:background .15s; }
-  .autocomplete-item:last-child { border-bottom:none; }
-  .autocomplete-item:hover,.autocomplete-item.active { background:#0e2a3a; color:var(--cyan); }
-  .results-header { font-family:'Share Tech Mono',monospace; font-size:.75rem; color:var(--grey); letter-spacing:.15em; text-transform:uppercase; margin-bottom:1rem; display:none; }
-  .results-header span { color:var(--cyan); }
-  .recipe-card { background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:1.2rem 1.4rem; margin-bottom:1rem; position:relative; overflow:hidden; animation:fadeIn .3s ease; transition:border-color .2s,box-shadow .2s; }
-  .recipe-card:hover { border-color:var(--cyan); box-shadow:var(--glow); }
-  .recipe-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--cyan),var(--cyan2)); opacity:.6; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .recipe-row { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; }
-  .ingredient { display:flex; flex-direction:column; align-items:center; background:#0d2035; border:1px solid var(--border); border-radius:6px; padding:.5rem .9rem; min-width:100px; }
-  .ingredient .iname { font-weight:600; font-size:.88rem; color:var(--white); text-align:center; line-height:1.3; }
-  .ingredient .qty { font-family:'Share Tech Mono',monospace; font-size:.75rem; color:var(--gold); margin-top:.15rem; }
-  .ingredient.result { background:#0a2010; border-color:#39d35366; }
-  .ingredient.result .iname { color:var(--green); }
-  .ingredient.result .qty { color:var(--cyan2); }
-  .arrow { font-size:1.4rem; color:var(--gold); font-weight:bold; flex-shrink:0; }
-  .plus { font-size:1.1rem; color:var(--grey); flex-shrink:0; }
-  .refinery-badge { margin-left:auto; font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25rem .6rem; border-radius:4px; border:1px solid var(--border); color:var(--grey); white-space:nowrap; flex-shrink:0; }
-  .refinery-badge.grande { border-color:#9b59b655; color:#c39bd3; }
-  .refinery-badge.media  { border-color:#f0c04055; color:var(--gold); }
-  .refinery-badge.todas  { border-color:#00d4ff33; color:var(--cyan); }
-  .no-results { text-align:center; padding:3rem 1rem; color:var(--grey); font-family:'Share Tech Mono',monospace; font-size:.9rem; }
-  .no-results .icon { font-size:2.5rem; margin-bottom:.8rem; display:block; }
-  .hint { text-align:center; padding:4rem 1rem; color:var(--grey); font-family:'Share Tech Mono',monospace; font-size:.85rem; letter-spacing:.08em; line-height:2.2; }
-  .hint .big { font-size:3rem; display:block; margin-bottom:1rem; }
-  .hint em { color:var(--cyan); font-style:normal; }
-  ::-webkit-scrollbar { width:6px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+:root{
+  --bg:#060e1a;--bg2:#081422;--panel:#0b1e30;--panel2:#0e2236;
+  --border:#163350;--border2:#1e4060;
+  --gold:#ffc844;--cyan:#00e5d4;--green:#00e676;
+  --purple:#b388ff;--pink:#f48fb1;--orange:#ffb74d;
+  --red:#ef9a9a;--blue:#64b5f6;--white:#e8f4ff;--text:#b0cce0;--grey:#4a7090;
+  --sidebar:270px;--topbar:60px;--radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* STARS */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+background-image:radial-gradient(1.5px 1.5px at 5% 10%,#fff5,transparent),radial-gradient(1px 1px at 15% 40%,#fff4,transparent),radial-gradient(2px 2px at 25% 70%,#fff5,transparent),radial-gradient(1px 1px at 40% 20%,#fff4,transparent),radial-gradient(1.5px 1.5px at 55% 55%,#fff5,transparent),radial-gradient(1px 1px at 65% 85%,#fff4,transparent),radial-gradient(2px 2px at 75% 15%,#fff5,transparent),radial-gradient(1px 1px at 85% 45%,#fff4,transparent),radial-gradient(1.5px 1.5px at 92% 75%,#fff5,transparent),radial-gradient(1px 1px at 30% 90%,#fff3,transparent),radial-gradient(1px 1px at 50% 5%,#fff4,transparent),radial-gradient(1.5px 1.5px at 70% 35%,#fff5,transparent);}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--topbar);z-index:200;background:rgba(6,14,26,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.2rem;gap:.9rem;}
+.hbtn{width:40px;height:40px;border:1px solid var(--border);background:var(--panel);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex-shrink:0;transition:all .2s;}
+.hbtn:hover{border-color:var(--cyan);background:var(--panel2)}
+.hbtn span{display:block;width:18px;height:2px;background:var(--cyan);border-radius:2px;transition:all .35s cubic-bezier(.4,0,.2,1);}
+.hbtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hbtn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hbtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.logo{font-family:'Orbitron',monospace;font-size:.88rem;font-weight:700;color:var(--gold);letter-spacing:.1em;text-shadow:0 0 20px #ffc84455;white-space:nowrap;flex-shrink:0;}
+.logo span{color:var(--cyan)}
+
+/* SEARCH */
+.sw{flex:1;max-width:500px;position:relative;}
+.sw input{width:100%;padding:.55rem 2.4rem .55rem 2.3rem;background:var(--panel);border:1.5px solid var(--border);border-radius:8px;color:var(--white);font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:all .25s;}
+.sw input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00e5d415}
+.sw input::placeholder{color:var(--grey)}
+.si{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--cyan);font-size:.9rem;pointer-events:none}
+.sx{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--grey);cursor:pointer;font-size:1rem;display:none;line-height:1;padding:0;}
+.sx:hover{color:var(--red)}
+.acd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--panel2);border:1px solid var(--border2);border-radius:10px;max-height:240px;overflow-y:auto;display:none;z-index:300;box-shadow:0 16px 48px #000d;}
+.acd.open{display:block}
+.aci{padding:.6rem 1rem;cursor:pointer;font-size:.87rem;border-bottom:1px solid var(--border);transition:background .15s;display:flex;align-items:center;gap:.5rem;}
+.aci:last-child{border-bottom:none}
+.aci:hover,.aci.hi{background:#0e2a3f;color:var(--cyan)}
+.aci-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:linear-gradient(180deg,#07111f,#060e1a);border-right:1px solid var(--border);position:fixed;top:var(--topbar);left:0;height:calc(100vh - var(--topbar));overflow-y:auto;z-index:150;transition:transform .35s cubic-bezier(.4,0,.2,1);padding:.8rem 0 3rem;}
+.sidebar.closed{transform:translateX(-100%)}
+.ngl{padding:.8rem 1.2rem .25rem;font-size:.62rem;letter-spacing:.2em;color:var(--grey);text-transform:uppercase;font-weight:800;}
+.ni{display:flex;align-items:center;gap:.6rem;padding:.52rem 1rem .52rem 1.2rem;margin:.08rem .5rem;border-radius:9px;cursor:pointer;font-size:.87rem;font-weight:700;color:#6a9ab8;transition:all .2s;border:1px solid transparent;}
+.ni:hover{background:#0d2236;color:var(--white);border-color:#1e3d55}
+.ni.on{background:linear-gradient(135deg,#0d2a40,#0a1e2e);color:var(--cyan);border-color:#00e5d430;box-shadow:0 2px 12px #00e5d415;}
+.nico{font-size:.95rem;width:20px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;font-size:.6rem;padding:.1rem .4rem;border-radius:4px;background:#00e5d420;color:var(--cyan);font-weight:800;}
+.overlay{display:none;position:fixed;inset:0;background:#000a;z-index:140;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);margin-top:var(--topbar);min-width:0;flex:1;padding:2rem 2rem 4rem;max-width:1150px;transition:margin-left .35s cubic-bezier(.4,0,.2,1);}
+.main.wide{margin-left:0}
+
+/* SECTIONS */
+.sec{display:none}.sec.on{display:block;animation:sin .3s ease}
+@keyframes sin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d2b45,#081828,#0b2036);border:1px solid var(--border2);border-radius:18px;padding:2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--gold),var(--green),var(--purple));border-radius:18px 18px 0 0;}
+.hero::before{content:'⬡';position:absolute;right:-1rem;bottom:-3rem;font-size:14rem;opacity:.03;color:var(--cyan);line-height:1;pointer-events:none;}
+.hero h1{font-family:'Orbitron',monospace;font-size:clamp(1.4rem,3vw,2rem);color:var(--gold);text-shadow:0 0 30px #ffc84455;margin-bottom:.5rem;line-height:1.2;}
+.hero p{color:var(--text);font-size:.98rem;max-width:580px;margin-bottom:1.4rem;line-height:1.7;}
+.htags{display:flex;flex-wrap:wrap;gap:.5rem;}
+.ht{padding:.3rem .85rem;border-radius:20px;font-size:.78rem;font-weight:800;cursor:pointer;transition:all .2s;border:1.5px solid;}
+.ht:hover{transform:translateY(-1px)}
+.tc{color:var(--cyan);border-color:#00e5d440;background:#00e5d410}.tc:hover{background:#00e5d425}
+.tg{color:var(--gold);border-color:#ffc84440;background:#ffc84410}.tg:hover{background:#ffc84425}
+.tgr{color:var(--green);border-color:#00e67640;background:#00e67610}.tgr:hover{background:#00e67625}
+.tp{color:var(--purple);border-color:#b388ff40;background:#b388ff10}.tp:hover{background:#b388ff25}
+.tpk{color:var(--pink);border-color:#f48fb140;background:#f48fb110}
+.tor{color:var(--orange);border-color:#ffb74d40;background:#ffb74d10}
+.tb{color:var(--blue);border-color:#64b5f640;background:#64b5f610}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.8rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.sh-i{font-size:2rem;line-height:1;flex-shrink:0}
+.sh-t h2{font-family:'Orbitron',monospace;font-size:1.15rem;color:var(--white);margin-bottom:.3rem}
+.sh-t p{font-size:.86rem;color:var(--text);line-height:1.6}
+
+/* CARDS GRID */
+.cg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin-bottom:1.5rem}
+.ic{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;position:relative;overflow:hidden;transition:all .25s;cursor:pointer;}
+.ic:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 24px #00e5d410}
+.ic-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+.ic-ico{font-size:1.8rem;margin-bottom:.6rem}
+.ic h4{font-size:.93rem;font-weight:800;color:var(--white);margin-bottom:.35rem}
+.ic p{font-size:.81rem;color:var(--text);line-height:1.6}
+
+/* RECIPE CARDS (refineria) */
+.rsw{position:relative;margin-bottom:1rem}
+.rsw input{width:100%;padding:.9rem 1rem .9rem 2.9rem;background:var(--panel);border:1.5px solid var(--border);border-radius:10px;color:var(--white);font-family:'Nunito',sans-serif;font-size:1rem;outline:none;transition:all .25s;}
+.rsw input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #00e5d415}
+.rsw input::placeholder{color:var(--grey)}
+.rc{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.95rem 1.15rem;margin-bottom:.65rem;position:relative;overflow:hidden;animation:sin .25s ease;transition:all .2s;}
+.rc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.rc:hover{border-color:var(--cyan);box-shadow:0 4px 20px #00e5d410}
+.rr{display:flex;align-items:center;flex-wrap:wrap;gap:.45rem}
+.ing{display:flex;flex-direction:column;align-items:center;background:#0a1e2f;border:1px solid var(--border);border-radius:8px;padding:.45rem .8rem;min-width:88px;transition:border-color .2s;}
+.ing:hover{border-color:var(--cyan)}
+.ing .n{font-weight:700;font-size:.8rem;color:var(--white);text-align:center;line-height:1.3}
+.ing .q{font-size:.7rem;color:var(--gold);margin-top:.1rem;font-weight:800}
+.ing.res{background:#0a2015;border-color:#00e67630}
+.ing.res .n{color:var(--green)}.ing.res .q{color:var(--cyan)}
+.arr{font-size:1.3rem;color:var(--gold);font-weight:900;flex-shrink:0}
+.pls{font-size:1rem;color:var(--grey);flex-shrink:0}
+.rb{margin-left:auto;font-size:.64rem;padding:.2rem .5rem;border-radius:5px;border:1px solid;font-weight:800;white-space:nowrap;flex-shrink:0;}
+.rbt{border-color:#00e5d430;color:var(--cyan)}.rbm{border-color:#ffc84430;color:var(--gold)}.rbg{border-color:#b388ff30;color:var(--purple)}
+.hint{text-align:center;padding:3rem 1rem;color:var(--grey);font-size:.9rem;line-height:2.2}
+.hint .hi{font-size:3rem;display:block;margin-bottom:.8rem}
+.hint em{color:var(--cyan);font-style:normal;font-weight:700}
+.nores{text-align:center;padding:2.5rem;color:var(--grey);font-size:.9rem}
+.nores span{font-size:2.5rem;display:block;margin-bottom:.6rem}
+
+/* TABLES */
+.tw{overflow-x:auto;margin-bottom:1.5rem;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:linear-gradient(90deg,#0d2a40,#091e30)}
+th{padding:.7rem 1rem;text-align:left;font-weight:800;color:var(--cyan);font-size:.71rem;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid #12283a}
+tbody tr:nth-child(even){background:#0a1c2c44}
+tbody tr:hover{background:#0d2236}
+td{padding:.62rem 1rem;color:var(--text);vertical-align:top;line-height:1.55}
+td:first-child{font-weight:700;color:var(--white)}
+.b{display:inline-flex;align-items:center;padding:.14rem .52rem;border-radius:5px;font-size:.71rem;font-weight:800;white-space:nowrap}
+.bg{background:#00e67618;color:var(--green);border:1px solid #00e67640}
+.by{background:#ffc84418;color:var(--gold);border:1px solid #ffc84440}
+.bc{background:#00e5d418;color:var(--cyan);border:1px solid #00e5d440}
+.bp{background:#b388ff18;color:var(--purple);border:1px solid #b388ff40}
+.bpk{background:#f48fb118;color:var(--pink);border:1px solid #f48fb140}
+.bo{background:#ffb74d18;color:var(--orange);border:1px solid #ffb74d40}
+.br{background:#ef9a9a18;color:var(--red);border:1px solid #ef9a9a40}
+.bb{background:#64b5f618;color:var(--blue);border:1px solid #64b5f640}
+
+/* TIP BOXES */
+.tip{display:flex;gap:.9rem;align-items:flex-start;border-radius:10px;padding:.95rem 1.15rem;margin-bottom:.8rem;border:1px solid;}
+.ti{font-size:1.4rem;flex-shrink:0;line-height:1;margin-top:.1rem}
+.tb2 .tt{font-weight:800;font-size:.9rem;margin-bottom:.22rem}
+.tb2 .td{font-size:.83rem;color:var(--text);line-height:1.6}
+.td strong{font-weight:800}
+.cy{border-color:#00e5d425;background:#00e5d408}.cy .tt{color:var(--cyan)}
+.gd{border-color:#ffc84425;background:#ffc84408}.gd .tt{color:var(--gold)}
+.gr{border-color:#00e67625;background:#00e67608}.gr .tt{color:var(--green)}
+.pp{border-color:#b388ff25;background:#b388ff08}.pp .tt{color:var(--purple)}
+.pk{border-color:#f48fb125;background:#f48fb108}.pk .tt{color:var(--pink)}
+.or{border-color:#ffb74d25;background:#ffb74d08}.or .tt{color:var(--orange)}
+.rd{border-color:#ef9a9a25;background:#ef9a9a08}.rd .tt{color:var(--red)}
+.bl{border-color:#64b5f625;background:#64b5f608}.bl .tt{color:var(--blue)}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.5rem}
+.step{display:flex;gap:.9rem;align-items:flex-start;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:.95rem 1.1rem;transition:border-color .2s;}
+.step:hover{border-color:var(--border2)}
+.sn{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--cyan),#008f88);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;color:#060e1a;}
+.st{font-weight:800;font-size:.9rem;color:var(--white);margin-bottom:.22rem}
+.sd{font-size:.82rem;color:var(--text);line-height:1.6}
+.sd strong{color:var(--white)}
+
+/* NP CARDS */
+.npf{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.4rem}
+.nfb{padding:.38rem .9rem;border-radius:20px;border:1.5px solid var(--border);background:var(--panel);color:var(--text);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Nunito',sans-serif;}
+.nfb:hover{border-color:var(--cyan);color:var(--white)}
+.nfb.on{background:#00e5d415;border-color:var(--cyan);color:var(--cyan)}
+.npg{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1rem;margin-bottom:1.5rem}
+.npc{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .25s;display:flex;flex-direction:column;}
+.npc:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 8px 24px #00e5d410}
+.nph{padding:.85rem 1.05rem .65rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;}
+.nph .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.nph h4{font-size:.88rem;font-weight:800;color:var(--white);line-height:1.2;flex:1}
+.nptier{font-size:.6rem;padding:.13rem .45rem;border-radius:4px;font-weight:800;white-space:nowrap;}
+.npb{padding:.85rem 1.05rem;flex:1;display:flex;flex-direction:column;gap:.5rem}
+.npr{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;font-size:.8rem;}
+.npi{background:#0a1e2f;border:1px solid var(--border);border-radius:6px;padding:.22rem .55rem;color:var(--text);white-space:nowrap;}
+.npi b{color:var(--white);font-weight:700}
+.npa{color:var(--gold);font-weight:900;flex-shrink:0}
+.npres{background:#0a2015;border:1px solid #00e67630;border-radius:6px;padding:.22rem .55rem;color:var(--green);font-weight:700;white-space:nowrap;}
+.npu{background:#060e1a;border-radius:6px;padding:.48rem .65rem;font-size:.78rem;color:var(--text);line-height:1.55;border-left:3px solid var(--cyan);}
+.npu strong{color:var(--cyan)}
+.nps{font-size:.68rem;color:var(--grey);margin-top:.2rem;}
+
+/* DIVIDER */
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:1.8rem 0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0!important;padding:1.2rem 1rem 3rem}
+  .npg{grid-template-columns:1fr}.cg2{grid-template-columns:1fr}
+}
+@media(max-width:480px){.hero{padding:1.5rem}.logo{font-size:.75rem}}
 </style>
 </head>
 <body>
-<div class="stars"></div>
-<div class="wrap">
-  <header>
-    <h1>NMS · REFINERÍA</h1>
-    <div class="line-dec"></div>
-    <p>// BUSCADOR INVERSO · ESCRIBE LO QUE QUIERES OBTENER //</p>
-  </header>
-  <div class="search-wrap">
-    <span class="search-icon">⬡</span>
-    <input type="text" id="search" placeholder="¿Qué quieres obtener? Ej: Metal cromático, Ferrita imantada, Nanitos..." autocomplete="off" spellcheck="false">
-    <button class="clear-btn" id="clearBtn">✕</button>
-    <div class="autocomplete" id="autocomplete"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="hbtn" id="hb"><span></span><span></span><span></span></button>
+  <div class="logo">⬡ NO MAN'S SKY <span>· GUÍA</span></div>
+  <div class="sw">
+    <span class="si">🔍</span>
+    <input type="text" id="gs" placeholder="Busca un recurso de refinería..." autocomplete="off" spellcheck="false">
+    <button class="sx" id="gx">✕</button>
+    <div class="acd" id="gac"></div>
   </div>
-  <div id="resultsHeader" class="results-header"></div>
-  <div id="results"></div>
 </div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sb">
+  <div class="ngl">Principal</div>
+  <div class="ni on" data-s="inicio"><span class="nico">🏠</span>Inicio</div>
+  <div class="ni" data-s="ref"><span class="nico">⚗️</span>Refinería<span class="nbadge">Buscador</span></div>
+  <div class="ni" data-s="nut"><span class="nico">🍳</span>Procesador Nutrientes</div>
+  <div class="ngl">Recursos</div>
+  <div class="ni" data-s="plan"><span class="nico">🌍</span>Recursos por Planeta</div>
+  <div class="ni" data-s="min"><span class="nico">💎</span>Minerales y Cristales</div>
+  <div class="ngl">Construcción</div>
+  <div class="ni" data-s="base"><span class="nico">🏗️</span>Guía de Bases</div>
+  <div class="ni" data-s="ener"><span class="nico">⚡</span>Energía y Cableado</div>
+  <div class="ni" data-s="cult"><span class="nico">🌱</span>Cultivos y Granja</div>
+  <div class="ngl">Tecnología</div>
+  <div class="ni" data-s="exo"><span class="nico">🧑‍🚀</span>Exotraje</div>
+  <div class="ni" data-s="nave"><span class="nico">🚀</span>Nave Estelar</div>
+  <div class="ni" data-s="tool"><span class="nico">🔧</span>Multiherramienta</div>
+  <div class="ngl">Combate</div>
+  <div class="ni" data-s="cent"><span class="nico">🤖</span>Centinelas</div>
+  <div class="ni" data-s="surv"><span class="nico">🛡️</span>Supervivencia</div>
+  <div class="ngl">Economía</div>
+  <div class="ni" data-s="econ"><span class="nico">💰</span>Ganar Unidades</div>
+  <div class="ni" data-s="nani"><span class="nico">⬡</span>Ganar Nanitos</div>
+  <div class="ni" data-s="com"><span class="nico">🛒</span>Comercio</div>
+  <div class="ngl">Exploración</div>
+  <div class="ni" data-s="hist"><span class="nico">📖</span>Historia Principal</div>
+  <div class="ni" data-s="port"><span class="nico">🌀</span>Portales y Glifos</div>
+  <div class="ni" data-s="ship"><span class="nico">🛸</span>Tipos de Nave</div>
+  <div class="ni" data-s="fau"><span class="nico">🦕</span>Fauna y Mascotas</div>
+  <div class="ngl">Referencia</div>
+  <div class="ni" data-s="tru"><span class="nico">💡</span>Trucos y Secretos</div>
+  <div class="ni" data-s="glos"><span class="nico">📚</span>Glosario</div>
+  <div class="ni" data-s="ctrl"><span class="nico">🎮</span>Controles PS5</div>
+</nav>
+<div class="overlay" id="ov"></div>
+
+<!-- MAIN -->
+<main class="main" id="mn">
+
+<!-- SEARCH RESULTS -->
+<div id="srSec" style="display:none">
+  <div id="srHdr" style="font-size:.75rem;letter-spacing:.12em;color:var(--grey);text-transform:uppercase;margin-bottom:1rem"></div>
+  <div id="srRes"></div>
+</div>
+
+<!-- ═══ INICIO ═══ -->
+<div class="sec on" id="s-inicio">
+  <div class="hero">
+    <h1>¡Bienvenido, Viajero! 🚀</h1>
+    <p>Tu guía galáctica completa de No Man's Sky. Aquí encontrarás todo: refinería con buscador, procesador de nutrientes completo, construcción de bases, tecnología, economía, exploración y mucho más. ¡Para principiantes y veteranos!</p>
+    <div class="htags">
+      <span class="ht tc" data-g="ref">⚗️ Refinería</span>
+      <span class="ht tg" data-g="nut">🍳 Nutrientes</span>
+      <span class="ht tgr" data-g="base">🏗️ Bases</span>
+      <span class="ht tg" data-g="econ">💰 Unidades</span>
+      <span class="ht tp" data-g="port">🌀 Portales</span>
+      <span class="ht tpk" data-g="fau">🦕 Fauna</span>
+      <span class="ht tor" data-g="tru">💡 Trucos</span>
+      <span class="ht tb" data-g="ctrl">🎮 Controles</span>
+    </div>
+  </div>
+  <div class="cg2">
+    <div class="ic" data-g="ref"><div class="ic-bar" style="background:linear-gradient(90deg,var(--cyan),transparent)"></div><div class="ic-ico">⚗️</div><h4>Refinería — Buscador</h4><p>Escribe lo que quieres obtener y aparecen todas las formas de conseguirlo al instante</p></div>
+    <div class="ic" data-g="nut"><div class="ic-bar" style="background:linear-gradient(90deg,var(--gold),transparent)"></div><div class="ic-ico">🍳</div><h4>Procesador de Nutrientes</h4><p>Más de 30 recetas detalladas con descripción de para qué sirve cada resultado</p></div>
+    <div class="ic" data-g="base"><div class="ic-bar" style="background:linear-gradient(90deg,var(--green),transparent)"></div><div class="ic-ico">🏗️</div><h4>Construcción de Bases</h4><p>Desde cero hasta una megabase de producción automatizada paso a paso</p></div>
+    <div class="ic" data-g="econ"><div class="ic-bar" style="background:linear-gradient(90deg,var(--gold),transparent)"></div><div class="ic-ico">💰</div><h4>Ganar Millones</h4><p>Los mejores métodos para acumular unidades y nanitos rápidamente</p></div>
+    <div class="ic" data-g="tru"><div class="ic-bar" style="background:linear-gradient(90deg,var(--orange),transparent)"></div><div class="ic-ico">💡</div><h4>Trucos Secretos</h4><p>Los consejos que los veteranos de miles de horas usan cada sesión</p></div>
+    <div class="ic" data-g="ctrl"><div class="ic-bar" style="background:linear-gradient(90deg,var(--blue),transparent)"></div><div class="ic-ico">🎮</div><h4>Controles PS5</h4><p>Todos los botones del DualSense explicados de forma clara y simple</p></div>
+  </div>
+  <div class="tip gd"><div class="ti">⭐</div><div class="tb2"><div class="tt">Tip para empezar</div><div class="td">Usa el <strong>buscador arriba</strong> para encontrar recetas de refinería al instante. Usa el menú <strong>☰</strong> para navegar entre las 20 secciones de la guía. ¡Todo está en español oficial del juego en PS5!</div></div></div>
+</div>
+
+<!-- ═══ REFINERÍA ═══ -->
+<div class="sec" id="s-ref">
+  <div class="sh"><div class="sh-i">⚗️</div><div class="sh-t"><h2>Refinería — Buscador de Recetas</h2><p>Escribe el nombre del recurso que quieres obtener y aparecen TODAS las formas de conseguirlo</p></div></div>
+  <div class="tip cy"><div class="ti">ℹ️</div><div class="tb2"><div class="tt">¿Cómo funciona la refinería?</div><div class="td"><strong style="color:var(--cyan)">Portátil</strong> (1 ranura, siempre contigo) · <strong style="color:var(--gold)">Mediana</strong> (2 ranuras, en base o carguero) · <strong style="color:var(--purple)">Grande</strong> (3 ranuras, la más rápida). Los materiales dentro de la refinería <strong>no se pierden al morir</strong>.</div></div></div>
+  <div class="rsw">
+    <span class="si">⬡</span>
+    <input type="text" id="rs" placeholder="¿Qué quieres obtener? Ej: Ferrita imantada, Metal cromático, Nanitos, Cloro..." autocomplete="off" spellcheck="false">
+    <button class="sx" id="rx" style="display:none">✕</button>
+    <div class="acd" id="rac"></div>
+  </div>
+  <div id="rhdr" style="font-size:.75rem;letter-spacing:.12em;color:var(--grey);text-transform:uppercase;margin-bottom:1rem;display:none"></div>
+  <div id="rres"><div class="hint"><span class="hi">⬡</span>Escribe el nombre de cualquier recurso para ver<br><em>todas las formas de obtenerlo en la refinería</em><br><br>Ejemplos: <em>Ferrita imantada · Metal cromático · Nanitos · Cloro · Nitrato de sodio · Platino</em></div></div>
+</div>
+
+<!-- ═══ PROCESADOR NUTRIENTES ═══ -->
+<div class="sec" id="s-nut">
+  <div class="sh"><div class="sh-i">🍳</div><div class="sh-t"><h2>Procesador de Nutrientes</h2><p>Todas las recetas con descripción completa de para qué sirve cada resultado</p></div></div>
+  <div class="tip gd"><div class="ti">💡</div><div class="tb2"><div class="tt">¿Qué es el Procesador de Nutrientes?</div><div class="td">Es una <strong>cocina galáctica</strong> con 3 ranuras que transforma ingredientes en comidas, cebos y consumibles valiosos en solo 5 segundos. Se desbloquea en la <strong>Anomalía Espacial</strong> por 10 Datos Recuperados. Las recetas se <strong>descubren combinando</strong> ingredientes, no vienen en un libro.</div></div></div>
+  <div class="npf" id="npf">
+    <button class="nfb on" data-c="all">📋 Todas</button>
+    <button class="nfb" data-c="basico">🌿 Básicas</button>
+    <button class="nfb" data-c="cebo">🦴 Cebos Animales</button>
+    <button class="nfb" data-c="cadena">🥛 Cadena Láctea</button>
+    <button class="nfb" data-c="cocina">🍽️ Cocina</button>
+    <button class="nfb" data-c="estrella">⭐ El Estrellador</button>
+    <button class="nfb" data-c="comercio">💰 Comercio</button>
+  </div>
+  <div class="npg" id="npg"></div>
+  <div class="div"></div>
+  <div class="sh"><div class="sh-i">⭐</div><div class="sh-t"><h2>El Estrellador — Guía Completa Paso a Paso</h2><p>El consumible más poderoso y valioso de No Man's Sky</p></div></div>
+  <div class="tip or"><div class="ti">⚠️</div><div class="tb2"><div class="tt">¿Para qué sirve El Estrellador?</div><div class="td">Al usarlo <strong>mejora permanentemente tu multiherramienta</strong>. También puedes <strong>refinarlo para obtener cientos de Nanitos</strong> o <strong>venderlo por millones de Unidades</strong>. Un stack de 100 puede transformar completamente tu economía en el juego. Es la receta más compleja pero la más rentable.</div></div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div><div class="st">Cultiva Flor de Pudretripas → Obtén Hecesio</div><div class="sd">La Flor de Pudretripas crece en bandejas hidropónicas en ~2 horas y produce <strong>Hecesio</strong>. También puedes obtener Hecesio alimentando animales con Pienso para Criaturas y recogiendo sus excrementos. Necesitas mucho Hecesio para producción masiva.</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">Hecesio → Levadura Silvestre (Procesador)</div><div class="sd">Pon <strong>Hecesio ×100</strong> en el procesador. Obtienes <strong>Levadura Silvestre ×100</strong>. Es el agente fermentador que hace que la masa suba. Sin levadura no hay masa, sin masa no hay Dónut, sin Dónut no hay Estrellador.</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">Cultiva Heliantemos → Obtén Cristal de Escarcha</div><div class="sd">Los Heliantemos crecen en ~1 hora y producen <strong>Cristal de Escarcha</strong>. Son la planta más rápida del juego. Construye al menos 25 bandejas para producción eficiente de Granos de Vidrio.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">Cristal de Escarcha → Granos de Vidrio (Procesador)</div><div class="sd">Procesa el <strong>Cristal de Escarcha</strong> → obtienes <strong>Granos de Vidrio ×100</strong>. Aportan textura a la masa del Estrellador.</div></div></div>
+    <div class="step"><div class="sn">5</div><div><div class="st">Cultiva Echinocactus → Carne de Cactus → Néctar → Azúcar</div><div class="sd">El Echinocactus tarda 16 horas pero da mucha <strong>Carne de Cactus</strong>. Procesa: <strong>Carne → Néctar de Cactus → Azúcar Procesada</strong> (2 pasos). El azúcar es el endulzante de toda la cadena del Estrellador.</div></div></div>
+    <div class="step"><div class="sn">6</div><div><div class="st">Levadura + Granos de Vidrio + Azúcar → Masa (3 ranuras)</div><div class="sd">Combina los tres ingredientes en el procesador: <strong>Levadura Silvestre + Granos de Vidrio + Azúcar Procesada → Masa ×100</strong>. Esta receta necesita las 3 ranuras del procesador simultáneamente.</div></div></div>
+    <div class="step"><div class="sn">7</div><div><div class="st">Domestica un animal que dé Leche Fresca</div><div class="sd">Busca animales grandes herbívoros (parecidos a vacas). Domestícalos con el cebo correcto. Una vez domesticados producen <strong>Leche Fresca</strong> periódicamente. <strong>Sin animales con leche no puedes hacer El Estrellador.</strong></div></div></div>
+    <div class="step"><div class="sn">8</div><div><div class="st">Leche → Nata → Mantequilla × 2 → Aceite Aclarado</div><div class="sd">Cadena de 3 pasos: <strong>Leche Fresca → Nata</strong> (1 ranura) · <strong>Nata + Nata → Mantequilla Batida</strong> (2 ranuras) · <strong>Mantequilla + Mantequilla → Aceite Aclarado</strong> (2 ranuras). Cada paso concentra el producto anterior.</div></div></div>
+    <div class="step"><div class="sn">9</div><div><div class="st">Masa + Aceite Aclarado + Azúcar → Dónut Lumpen</div><div class="sd">Combina los 3 en el procesador → <strong>Dónut Lumpen ×100</strong>. Postre alienígena frito. Es el primer componente final del Estrellador. También se puede vender o consumir para buffs menores.</div></div></div>
+    <div class="step"><div class="sn">10</div><div><div class="st">Metal Cromático → Huevos de Silicio (Procesador)</div><div class="sd">Procesa <strong>Metal Cromático ×100</strong> → <strong>Huevos de Silicio ×100</strong>. Proteína alienígena de silicio. Ingrediente base de las Natillas Estelares, el segundo componente del Estrellador.</div></div></div>
+    <div class="step"><div class="sn">11</div><div><div class="st">Huevos de Silicio + Nata + Azúcar → Natillas Estelares</div><div class="sd">Combina los 3 en el procesador → <strong>Natillas Estelares ×100</strong>. Postre cremoso de origen cósmico. Segundo componente final del Estrellador. También se puede vender bien por sí solas.</div></div></div>
+    <div class="step"><div class="sn">12</div><div><div class="st">⭐ Dónut Lumpen + Natillas Estelares → EL ESTRELLADOR</div><div class="sd">El momento cumbre: <strong>Dónut Lumpen + Natillas Estelares → El Estrellador ×100</strong>. ¡El consumible más valioso del universo! Úsalo para mejorar tu multiherramienta, refínalo para nanitos, o véndelo por millones.</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ PLANETAS ═══ -->
+<div class="sec" id="s-plan">
+  <div class="sh"><div class="sh-i">🌍</div><div class="sh-t"><h2>Recursos por Tipo de Planeta</h2><p>Cada bioma tiene recursos exclusivos — saber dónde buscar te ahorra horas de viaje</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo de Planeta</th><th>Clima</th><th>Recurso Exclusivo</th><th>Otros Recursos</th><th>Peligro</th></tr></thead>
+    <tbody>
+      <tr><td>🟡 Árido / Desértico</td><td>Caliente y seco</td><td><span class="b by">Pirita</span></td><td>Carne de Cactus, Polvo de Ferrita, Carbono</td><td><span class="b br">Calor</span></td></tr>
+      <tr><td>🔵 Congelado / Ártico</td><td>Muy frío</td><td><span class="b bc">Dioxita</span></td><td>Cristal de Escarcha, Ferrita, Cobalto</td><td><span class="b bc">Frío</span></td></tr>
+      <tr><td>🟢 Exuberante / Tropical</td><td>Húmedo y cálido</td><td><span class="b bg">Parafinio</span></td><td>Moho Fúngico, Sal, Carbono, Mordita</td><td>Bajo</td></tr>
+      <tr><td>☠️ Tóxico / Venenoso</td><td>Atmósfera venenosa</td><td><span class="b bp">Amoníaco</span></td><td>Hecesio, Moho Fúngico, Sal</td><td><span class="b bp">Toxicidad</span></td></tr>
+      <tr><td>🔴 Abrasado / Volcánico</td><td>Extremadamente caliente</td><td><span class="b bo">Sulfurina</span></td><td>Azufre, Basalto, Pirita</td><td><span class="b br">Calor máximo</span></td></tr>
+      <tr><td>⚡ Radiactivo</td><td>Radiación alta</td><td><span class="b bg">Uranio</span></td><td>Fósforo, Polvo Maldito, Carbono</td><td><span class="b by">Radiación</span></td></tr>
+      <tr><td>🌊 Oceánico / Acuático</td><td>Cubierto de agua</td><td><span class="b bc">Saco de Algas · Sal</span></td><td>Dihidrógeno, Cobalto, Cloro</td><td>Bajo</td></tr>
+      <tr><td>🪐 Muerto / Estéril</td><td>Sin atmósfera</td><td><span class="b by">Cobalto · Plata</span></td><td>Ferrita, Dihidrógeno, Silicato</td><td>Moderado</td></tr>
+      <tr><td>✨ Exótico / Raro</td><td>Muy peculiar</td><td><span class="b bpk">Polvo de Gravitino</span></td><td>Recursos únicos según subtipo</td><td><span class="b br">¡Centinelas!</span></td></tr>
+      <tr><td>❄️ Frío Moderado</td><td>Templado frío</td><td><span class="b bc">Nitrógeno</span></td><td>Dioxita, Carbono, Ferrita</td><td><span class="b bc">Frío leve</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip gd"><div class="ti">⭐</div><div class="tb2"><div class="tt">Tipos de Estrella y Metales Cromáticos</div><div class="td"><strong style="color:#ffe">Amarilla</strong> → Cobre · <strong style="color:#f99">Roja</strong> → Cadmio · <strong style="color:#9f9">Verde</strong> → Emerilio · <strong style="color:#9bf">Azul</strong> → Indio. Para viajar a sistemas de colores necesitas mejoras del motor de hiperpropulsión.</div></div></div>
+  <div class="tip cy"><div class="ti">⛏️</div><div class="tb2"><div class="tt">Los depósitos más grandes están bajo tierra</div><div class="td">Usa el <strong>Manipulador de Terreno</strong> para excavar. El <strong>Visor de Análisis</strong> (L2) muestra marcadores: 🔵 Azul = Dihidrógeno, 🟡 Amarillo = Sodio/Nitrato, 🔴 Rojo = Oxígeno. Los grandes depósitos tienen 5-10 veces más recursos que los superficiales.</div></div></div>
+</div>
+
+<!-- ═══ MINERALES ═══ -->
+<div class="sec" id="s-min">
+  <div class="sh"><div class="sh-i">💎</div><div class="sh-t"><h2>Minerales, Cristales y Recursos Especiales</h2><p>Todo lo que brilla y vale en el universo de NMS</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Recurso</th><th>Símbolo</th><th>Dónde Encontrarlo</th><th>Para Qué Sirve</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Dihidrógeno</td><td>H₂</td><td>Cristales azules en casi todos los planetas</td><td>Recargar propulsor de lanzamiento, recetas de refinería</td><td><span class="b bc">Básico</span></td></tr>
+      <tr><td>Polvo de Ferrita</td><td>Fe</td><td>Rocas en todos los planetas</td><td>Construcción básica, base de muchas recetas de refinería</td><td><span class="b bc">Básico</span></td></tr>
+      <tr><td>Ferrita Pura</td><td>Fe+</td><td>Refinando Polvo de Ferrita</td><td>Construcción avanzada, tecnología de exotraje</td><td><span class="b bg">Medio</span></td></tr>
+      <tr><td>Ferrita Imantada</td><td>Fe++</td><td>Refinando Ferrita Pura</td><td>Estructuras avanzadas, módulos S-class</td><td><span class="b by">Alto</span></td></tr>
+      <tr><td>Cobalto</td><td>Co</td><td>Cuevas y minerales azul oscuro</td><td>Cobalto Ionizado, recetas, tecnología</td><td><span class="b bg">Medio</span></td></tr>
+      <tr><td>Plata</td><td>Ag</td><td>Asteroides en el espacio, depósitos planetarios</td><td>Comercio, ciclo hacia Oro y Platino</td><td><span class="b by">Alto</span></td></tr>
+      <tr><td>Oro</td><td>Au</td><td>Nódulos amarillos (Dedos de Metal) en superficie</td><td>El más vendible, recetas de aleaciones</td><td><span class="b by">Alto</span></td></tr>
+      <tr><td>Platino</td><td>Pt</td><td>Asteroides, depósitos exóticos, refinería</td><td>El metal más valioso vendible</td><td><span class="b bpk">Muy alto</span></td></tr>
+      <tr><td>Polvo de Gravitino</td><td>—</td><td>Planetas exóticos (¡activa Centinelas!)</td><td>50 Nanitos c/u en refinería</td><td><span class="b bp">Especial</span></td></tr>
+      <tr><td>Huevo de Larva</td><td>—</td><td>Nidos subterráneos peligrosos</td><td>65 Nanitos c/u — el más rentable</td><td><span class="b bpk">Máximo</span></td></tr>
+      <tr><td>Cristal de Escarcha</td><td>—</td><td>Planetas congelados o cultivando Heliantemos</td><td>Granos de Vidrio → El Estrellador</td><td><span class="b bc">Medio</span></td></tr>
+      <tr><td>Metal Cromático</td><td>—</td><td>Refinando Cobre/Cadmio/Emerilio/Indio</td><td>Tecnología esencial, El Estrellador</td><td><span class="b bg">Medio</span></td></tr>
+      <tr><td>Residuo Aceitoso</td><td>—</td><td>Centinelas destruidos (botín)</td><td>20 Nanitos o 20 Dihidrógeno en refinería</td><td><span class="b by">Bueno</span></td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══ BASES ═══ -->
+<div class="sec" id="s-base">
+  <div class="sh"><div class="sh-i">🏗️</div><div class="sh-t"><h2>Construcción de Bases — Guía Completa</h2><p>Desde el primer ordenador hasta una megabase de producción automatizada</p></div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div><div class="st">Elige la ubicación perfecta</div><div class="sd">Busca un planeta sin peligros atmosféricos graves. Lo ideal es estar cerca de un <strong>Punto Electromagnético</strong> (energía infinita), depósitos de minerales y nubes de gas atmosférico. Radio máximo de construcción: ~1000 unidades desde el ordenador de base.</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">Coloca el Ordenador de Base (40 Metal Cromático)</div><div class="sd">Aparece en tu menú Tecnología Portátil. Una vez colocado, la base queda registrada permanentemente. Puedes <strong>teletransportarte</strong> a ella desde cualquier estación espacial o desde la Anomalía Espacial.</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">Contrata al Constructor y activa el Terminal</div><div class="sd">Busca un <strong>Trabajador Constructor</strong> en las estaciones espaciales (cualquier raza). El terminal activa la misión "Expandir la Base" que desbloquea planos de construcción gratis paso a paso.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">Instala energía (Electromagnética es la mejor)</div><div class="sd">Opción A: <strong>Generador Electromagnético</strong> sobre un punto de energía = energía infinita constante. Opción B: <strong>2 Paneles Solares + 1 Batería</strong> por cada 50 kPs necesarios. La electromagnética es siempre superior.</div></div></div>
+    <div class="step"><div class="sn">5</div><div><div class="st">Instala Extractores y Tuberías de Recursos</div><div class="sd">Los <strong>Extractores de Minerales</strong> van sobre depósitos subterráneos. Conéctalos con <strong>Tuberías de Recursos</strong> a Contenedores de Almacenamiento. Más extractores en el mismo depósito = extracción más rápida.</div></div></div>
+    <div class="step"><div class="sn">6</div><div><div class="st">Añade Recolectores de Gases Atmosféricos</div><div class="sd">Colocados en el suelo, recolectan automáticamente el gas del planeta (Nitrógeno, Sulfurina o Radón). Necesitan energía. Son completamente pasivos: trabajan solos mientras estás fuera.</div></div></div>
+    <div class="step"><div class="sn">7</div><div><div class="st">Construye la Refinería Grande (3 ranuras)</div><div class="sd">Se desbloquea con la <strong>Terminal Científica</strong>. Procesa 3 ingredientes a la vez, mucho más rápido que la portátil. Instala varias en paralelo para procesar diferentes materiales simultáneamente.</div></div></div>
+    <div class="step"><div class="sn">8</div><div><div class="st">Contrata todos los Trabajadores</div><div class="sd"><strong>Constructor</strong> (misiones base) · <strong>Científico</strong> (tecnologías) · <strong>Granjero</strong> (cultivos) · <strong>Armero</strong> (armas) · <strong>Operador</strong> (terminal de comercio). Todos se encuentran en estaciones espaciales.</div></div></div>
+  </div>
+  <div class="tip or"><div class="ti">🔑</div><div class="tb2"><div class="tt">Secreto: Extender el radio de construcción</div><div class="td">Si el recurso está a más de 300 unidades, coloca objetos pequeños (luces, banderas) formando un camino desde la base hasta el recurso. Cada objeto empuja el límite. ¡Puedes llegar muy lejos con paciencia!</div></div></div>
+</div>
+
+<!-- ═══ ENERGÍA ═══ -->
+<div class="sec" id="s-ener">
+  <div class="sh"><div class="sh-i">⚡</div><div class="sh-t"><h2>Energía y Cableado Eléctrico</h2><p>Mantén tu base encendida 24/7 con el sistema de energía correcto</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Fuente</th><th>Energía</th><th>Funciona</th><th>Consejo clave</th></tr></thead>
+    <tbody>
+      <tr><td>⚡ Generador Electromagnético</td><td><span class="b bpk">Enorme (clase S)</span></td><td>24/7 sin parar</td><td>¡La mejor! Solo en Puntos Calientes de Energía. Usa el Dispositivo de Sondeo para encontrarlos.</td></tr>
+      <tr><td>☀️ Panel Solar</td><td><span class="b bg">50 kPs por panel</span></td><td>Solo de día</td><td>Usa 2 paneles + 1 batería por cada 50 kPs. Imprescindible la batería para la noche.</td></tr>
+      <tr><td>🔋 Batería</td><td><span class="b bc">Almacena excedente</span></td><td>Descarga de noche</td><td>Sin baterías, los paneles solares no cubren la noche. Siempre en pareja con paneles.</td></tr>
+      <tr><td>🌿 Biorreactor</td><td><span class="b by">Variable</span></td><td>Con combustible</td><td>Usa Carbono como combustible. Bueno para inicio, pero reemplázalo con electromagnética.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip cy"><div class="ti">🔌</div><div class="tb2"><div class="tt">Cómo conectar el cableado — es GRATIS</div><div class="td">Ve a <strong>Energía e Industria → Cable Eléctrico</strong>. No cuesta nada. Haz clic en el enchufe azul del generador y arrastra hasta cada dispositivo. Para bases grandes usa <strong>Transformadores</strong>: conecta el cable principal al transformador y todo lo que esté dentro del edificio recibe energía automáticamente.</div></div></div>
+  <div class="tip gd"><div class="ti">🔍</div><div class="tb2"><div class="tt">Cómo encontrar Puntos Electromagnéticos</div><div class="td">Instala el <strong>Dispositivo de Sondeo</strong> en tu Visor de Análisis (compra en la Anomalía). Activa el modo sondeo y busca el ícono ⚡. Apila varios generadores <strong>verticalmente en el centro exacto del punto</strong> para multiplicar la energía. Un punto clase S puede alimentar decenas de extractores y refinerías.</div></div></div>
+</div>
+
+<!-- ═══ CULTIVOS ═══ -->
+<div class="sec" id="s-cult">
+  <div class="sh"><div class="sh-i">🌱</div><div class="sh-t"><h2>Cultivos y Granja Automática</h2><p>Recursos ilimitados de forma pasiva sin salir de tu base</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Planta</th><th>Producto</th><th>Tiempo</th><th>Uso Principal</th><th>Cómo desbloquear</th></tr></thead>
+    <tbody>
+      <tr><td>🌵 Echinocactus</td><td>Carne de Cactus</td><td>16 horas</td><td>El Estrellador (Azúcar), Pirita en refinería</td><td>Granjero o Anomalía</td></tr>
+      <tr><td>❄️ Heliantemo</td><td>Cristal de Escarcha</td><td>1 hora</td><td>El Estrellador (Granos de Vidrio), Dioxita</td><td>Granjero o Anomalía</td></tr>
+      <tr><td>💩 Flor de Pudretripas</td><td>Hecesio</td><td>2 horas</td><td>El Estrellador (Levadura), cebos, nanitos</td><td>Granjero (misión base)</td></tr>
+      <tr><td>⭐ Bulbo Estelar</td><td>Bulbo Estelar</td><td>4 horas</td><td>Parafinio en refinería, Sodio, cocina avanzada</td><td>Granjero o Anomalía</td></tr>
+      <tr><td>🟡 Solanio</td><td>Solanio</td><td>4 horas</td><td>Metal Cromático en refinería (muy rentable)</td><td>Granjero o Anomalía</td></tr>
+      <tr><td>🌑 Mordita</td><td>Mordita</td><td>2 horas</td><td>Cebos de carnívoros, Bulbo de Médula, recetas</td><td>Granjero (misión base)</td></tr>
+      <tr><td>🟠 Raíz Gamma</td><td>Raíz Gamma</td><td>2 horas</td><td>Carbono y Uranio en refinería</td><td>Granjero o exploración</td></tr>
+      <tr><td>🟢 Moho Fúngico</td><td>Moho Fúngico</td><td>2 horas</td><td>Carbono, Amoníaco en refinería, Mordita</td><td>Granjero (misión base)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip gr"><div class="ti">🌿</div><div class="tb2"><div class="tt">Bandejas Hidropónicas — cultiva en cualquier planeta</div><div class="td">Las <strong>Bandejas Hidropónicas</strong> permiten cultivar cualquier planta dentro de tu base, sin importar el bioma del planeta. Necesitan energía eléctrica conectada. Las <strong>Biocúpulas</strong> dan más espacio de cultivo cubierto para plantas al aire libre dentro de la base.</div></div></div>
+</div>
+
+<!-- ═══ EXOTRAJE ═══ -->
+<div class="sec" id="s-exo">
+  <div class="sh"><div class="sh-i">🧑‍🚀</div><div class="sh-t"><h2>Tecnología del Exotraje</h2><p>Mejora tu traje para sobrevivir en cualquier entorno del universo</p></div></div>
+  <div class="cg2">
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--cyan),transparent)"></div><div class="ic-ico">🛡️</div><h4>Protección ante Peligros</h4><p>Instala módulos de protección: frío, calor, radiación o toxinas. Los <strong>S-class</strong> son los mejores. Se consiguen en terminales de tecnología de estaciones espaciales con nanitos.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--green),transparent)"></div><div class="ic-ico">🎒</div><h4>Expansión de Inventario</h4><p>Compra ranuras adicionales en estaciones espaciales. También desbloquea ranuras encontrando <strong>Módulos de Expansión</strong> en mochilas abandonadas en planetas.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--gold),transparent)"></div><div class="ic-ico">🚀</div><h4>Propulsores de Movimiento</h4><p><strong>Propulsor de Cohete</strong> y <strong>Propulsor a Chorro</strong> para volar. El <strong>Traje de Infiltración</strong> permite flotar en silencio para evitar Centinelas.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--purple),transparent)"></div><div class="ic-ico">🔋</div><h4>Soporte Vital</h4><p>Se recarga con <strong>Oxígeno</strong>. Los módulos de batería aumentan la duración. Siempre lleva Oxígeno extra al explorar planetas peligrosos.</p></div>
+  </div>
+  <div class="tip pp"><div class="ti">⬡</div><div class="tb2"><div class="tt">Sinergia de módulos adyacentes — el secreto pro</div><div class="td">Coloca módulos del <strong>mismo tipo adyacentes entre sí</strong> en tu inventario. Los módulos vecinos se potencian mutuamente con <strong>bonificaciones de sinergia</strong>. Un grupo de 3 módulos S-class bien posicionados supera a 6 módulos A-class dispersos. ¡Siempre agrupa!</div></div></div>
+</div>
+
+<!-- ═══ NAVE ═══ -->
+<div class="sec" id="s-nave">
+  <div class="sh"><div class="sh-i">🚀</div><div class="sh-t"><h2>Naves Estelares — Tipos y Estrategias</h2><p>Elige la nave correcta según tu estilo de juego</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo</th><th>Especialidad</th><th>Ranuras máx.</th><th>¿Para quién?</th><th>Bono especial</th></tr></thead>
+    <tbody>
+      <tr><td>🔫 Caza</td><td>Combate espacial</td><td>19 cargo + 12 tech</td><td>Combatientes, piratas, Centinelas</td><td>+50% daño en combate</td></tr>
+      <tr><td>🌿 Explorador</td><td>Viajes de hiperpropulsión</td><td>21 cargo + 14 tech</td><td>Exploradores, llegar al centro galáctico</td><td>+100% alcance de salto</td></tr>
+      <tr><td>🚛 Transportista</td><td>Máximo inventario</td><td>48 cargo + 8 tech</td><td>Comerciantes, acumuladores de recursos</td><td>Mayor espacio de carga</td></tr>
+      <tr><td>🔬 Científico</td><td>Escaneo y descubrimientos</td><td>20 cargo + 13 tech</td><td>Jugadores que escanean fauna y flora</td><td>+50% nanitos de escaneo</td></tr>
+      <tr><td>🤖 Interceptor Centinela</td><td>Combate extremo</td><td>12 cargo + 6 tech</td><td>Combatientes avanzados</td><td>Tecnología centinela única</td></tr>
+      <tr><td>🛸 Exótica</td><td>Todos los bonos a la vez</td><td>15 cargo + 3 tech</td><td>Coleccionistas, jugadores avanzados</td><td>Bonos de todas las clases</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip gd"><div class="ti">🎁</div><div class="tb2"><div class="tt">¿Cómo conseguir tu primer carguero GRATIS?</div><div class="td">Después de hacer <strong>3 saltos hiperespaciales</strong>, aparece un mensaje de carguero siendo atacado por piratas. Entra al sistema, <strong>destruye los piratas</strong> y el capitán te lo regala completamente gratis. ¡Acéptalo siempre! Es el mejor inicio para almacenamiento masivo.</div></div></div>
+</div>
+
+<!-- ═══ HERRAMIENTA ═══ -->
+<div class="sec" id="s-tool">
+  <div class="sh"><div class="sh-i">🔧</div><div class="sh-t"><h2>Multiherramienta</h2><p>Tu instrumento todo en uno: mina, escanea y combate</p></div></div>
+  <div class="cg2">
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--cyan),transparent)"></div><div class="ic-ico">⛏️</div><h4>Láser de Extracción</h4><p>Tu minero principal. Mejora con <strong>Resonador de Impacto</strong> (más eficiente) o <strong>Expansor de Rayo</strong> (área mayor). Esencial para depósitos profundos y minerales duros.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--green),transparent)"></div><div class="ic-ico">🔭</div><h4>Visor de Análisis</h4><p>Escanea fauna, flora y minerales para ganar unidades. Los animales <strong>no descubiertos valen mucho más</strong>. Fauna completa de un planeta = millones de unidades al subirlos.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--orange),transparent)"></div><div class="ic-ico">💥</div><h4>Cañón de Plasma</h4><p>El arma más poderosa contra Centinelas. Proyectiles explosivos con daño masivo. <strong>Imprescindible en Nivel 4-5</strong> para destruir el Caminante Centinela gigante.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--purple),transparent)"></div><div class="ic-ico">🌊</div><h4>Manipulador de Terreno</h4><p>Modifica el terreno: excava, aplana, construye cavernas. Los <strong>depósitos más grandes siempre están bajo la superficie</strong>. Imprescindible para extracciones masivas.</p></div>
+  </div>
+</div>
+
+<!-- ═══ CENTINELAS ═══ -->
+<div class="sec" id="s-cent">
+  <div class="sh"><div class="sh-i">🤖</div><div class="sh-t"><h2>Centinelas — Niveles de Alerta y Estrategias</h2><p>Los guardianes del universo: evítalos o destrúyelos con estrategia</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Nivel</th><th>Qué aparece</th><th>Qué hacer</th><th>Para resetear la alerta</th></tr></thead>
+    <tbody>
+      <tr><td>⭐ Nivel 1</td><td>Un Centinela te observa</td><td>Aléjate caminando. No atacan todavía.</td><td>Desaparece solo al alejarte</td></tr>
+      <tr><td>⭐⭐ Nivel 2</td><td>Varios Centinelas atacan</td><td>Elimínalos o escóndete 30s fuera de su vista</td><td>~1 minuto oculto en cueva o edificio</td></tr>
+      <tr><td>⭐⭐⭐ Nivel 3</td><td>Centinelas + Perros Centinela</td><td>Busca cueva urgente o sube a tu nave</td><td>~2 minutos completamente oculto</td></tr>
+      <tr><td>⭐⭐⭐⭐ Nivel 4</td><td>Caminante Centinela (gigante)</td><td>¡Cañón de Plasma al punto de control en su lomo!</td><td>~3 minutos oculto tras eliminarlo</td></tr>
+      <tr><td>⭐⭐⭐⭐⭐ Nivel 5</td><td>Cazas espaciales te persiguen</td><td>Sube a tu nave y huye con motor de pulso o combate</td><td>Debes eliminar todos los cazas</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip rd"><div class="ti">⚠️</div><div class="tb2"><div class="tt">¡Cuidado con el Polvo de Gravitino!</div><div class="td">Recoger <strong>Polvo de Gravitino</strong> activa inmediatamente a los Centinelas. Vale 50 Nanitos en refinería pero si subes al nivel 5 es muy difícil escapar. Lleva siempre el <strong>Cañón de Plasma cargado</strong> antes de recogerlo en planetas exóticos.</div></div></div>
+  <div class="tip gr"><div class="ti">💰</div><div class="tb2"><div class="tt">Los Centinelas dan recursos valiosos al morir</div><div class="td">Los Centinelas destruidos sueltan <strong>Residuo Aceitoso</strong> (20 Nanitos o 20 Dihidrógeno en refinería), <strong>Conducto Neural</strong> (50 Nanitos) y componentes. Un enfrentamiento de Nivel 3-4 bien preparado puede ser muy rentable.</div></div></div>
+</div>
+
+<!-- ═══ SUPERVIVENCIA ═══ -->
+<div class="sec" id="s-surv">
+  <div class="sh"><div class="sh-i">🛡️</div><div class="sh-t"><h2>Supervivencia y Peligros Atmosféricos</h2><p>Mantente vivo en los entornos más hostiles del universo</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Peligro</th><th>Planeta</th><th>Módulo protector</th><th>Se recarga con</th><th>Emergencia</th></tr></thead>
+    <tbody>
+      <tr><td>❄️ Frío Extremo</td><td>Congelado/Ártico</td><td>Protección Térmica (Frío)</td><td>Difosfato o Nitrato de Sodio</td><td>Entra en una cueva — bloquea todo el frío</td></tr>
+      <tr><td>🔥 Calor Extremo</td><td>Árido/Abrasado</td><td>Protección Térmica (Calor)</td><td>Difosfato o Nitrato de Sodio</td><td>Las tormentas son temporales, espera dentro</td></tr>
+      <tr><td>☢️ Radiación</td><td>Radiactivo</td><td>Protección Radiactiva</td><td>Difosfato o Nitrato de Sodio</td><td>Los edificios bloquean toda la radiación</td></tr>
+      <tr><td>☠️ Toxinas</td><td>Tóxico/Venenoso</td><td>Protección Tóxica</td><td>Difosfato o Nitrato de Sodio</td><td>El agua en planetas tóxicos también daña</td></tr>
+      <tr><td>⚡ Tormenta</td><td>Cualquier hostil</td><td>Módulo de tormenta avanzado</td><td>—</td><td>Siempre temporales (~2-5 min). Espera en cueva.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip cy"><div class="ti">🏠</div><div class="tb2"><div class="tt">Las cuevas bloquean TODOS los peligros atmosféricos</div><div class="td">Si estás en peligro sin recursos, usa el escáner para encontrar la cueva más cercana. Además de protegerte, las cuevas tienen mayor concentración de <strong>Cobalto, Dihidrógeno</strong> y depósitos profundos de minerales.</div></div></div>
+</div>
+
+<!-- ═══ ECONOMÍA ═══ -->
+<div class="sec" id="s-econ">
+  <div class="sh"><div class="sh-i">💰</div><div class="sh-t"><h2>Ganar Unidades — Los Mejores Métodos</h2><p>De viajero pobre a multimillonario galáctico paso a paso</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Método</th><th>Ganancias</th><th>Dificultad</th><th>Cómo hacerlo</th></tr></thead>
+    <tbody>
+      <tr><td>🔭 Escanear fauna completa</td><td><span class="b bg">Media-Alta</span></td><td>⭐ Muy fácil</td><td>Escanea todos los animales de un planeta con el Visor de Análisis. Fauna completa da bonificación de millones. Sube a la nave para cobrar.</td></tr>
+      <tr><td>🛒 Ruta Sal → Cloro</td><td><span class="b bg">Media</span></td><td>⭐ Muy fácil</td><td>Refina Sal + Oxígeno → Cloro en masa. Luego Cloro + Oxígeno → más Cloro. Vende el Cloro. Fácil y constante.</td></tr>
+      <tr><td>💎 Ciclo Plata→Oro→Platino</td><td><span class="b by">Alta</span></td><td>⭐⭐ Media</td><td>Refina Plata en Oro, Oro en Platino. Vende Platino en sistemas de economía alta (💰💰💰).</td></tr>
+      <tr><td>📦 Misiones de Frigata</td><td><span class="b by">Alta</span></td><td>⭐⭐ Media</td><td>Envía frigatas en misiones de Comercio e Industrial de 16-24h. Trabajan solas mientras juegas.</td></tr>
+      <tr><td>🌾 Granja de Solanio</td><td><span class="b bpk">Muy Alta</span></td><td>⭐⭐⭐ Difícil</td><td>50 plantas de Solanio → Metal Cromático → vender. Decenas de millones cada 4 horas de forma pasiva.</td></tr>
+      <tr><td>⭐ El Estrellador</td><td><span class="b bpk">Masiva</span></td><td>⭐⭐⭐ Difícil</td><td>Stack de 100 El Estrellador = 50-100 millones. La receta más compleja pero la más rentable del juego.</td></tr>
+      <tr><td>🤝 Misiones del Nexo</td><td><span class="b bg">Media</span></td><td>⭐ Muy fácil</td><td>Tablero diario de la Anomalía Espacial. Las de Recuperación de Datos y Muestras Biológicas son las más rápidas.</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══ NANITOS ═══ -->
+<div class="sec" id="s-nani">
+  <div class="sh"><div class="sh-i">⬡</div><div class="sh-t"><h2>Ganar Nanitos — Fuentes Rankeadas</h2><p>Los nanitos desbloquean tecnología S-class y mejoras especiales</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Fuente</th><th>Nanitos/unidad</th><th>Dificultad</th><th>Cómo conseguirlos</th></tr></thead>
+    <tbody>
+      <tr><td>Unidad de Mapeo Autónomo</td><td><span class="b bpk">80</span></td><td>Difícil</td><td>Misiones especiales y exploración avanzada</td></tr>
+      <tr><td>Huevo de Larva</td><td><span class="b bpk">65</span></td><td>Peligroso</td><td>Nidos subterráneos en planetas exóticos</td></tr>
+      <tr><td>Polvo de Gravitino</td><td><span class="b by">50</span></td><td>Activa Centinelas</td><td>Planetas exóticos. ¡Lleva armas!</td></tr>
+      <tr><td>Conducto Neural</td><td><span class="b by">50</span></td><td>Combate</td><td>Botín de Centinelas destruidos</td></tr>
+      <tr><td>Légamo Solidificado</td><td><span class="b bg">30</span></td><td>Fácil</td><td>Exploración planetaria general</td></tr>
+      <tr><td>Residuo Acuoso</td><td><span class="b bg">25</span></td><td>Fácil</td><td>Exploración y fauna</td></tr>
+      <tr><td>Gas Nocivo / Residuo Tóxico / Residuo Aceitoso</td><td><span class="b bc">20</span></td><td>Muy fácil</td><td>Exploración de planetas en general</td></tr>
+      <tr><td>Cristales (Silicato, Ferrocos, Solanas, Ruinas)</td><td><span class="b bc">20</span></td><td>Fácil</td><td>En cuevas y superficies planetarias</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tip pp"><div class="ti">💡</div><div class="tb2"><div class="tt">El método más fácil y constante</div><div class="td">Acumula <strong>Gas Nocivo, Residuo Tóxico y Residuo Aceitoso</strong> durante la exploración y refínalos en 20 nanitos cada uno. Sin ningún peligro. Cientos de unidades dan miles de nanitos que puedes gastar en mejoras S-class en la Anomalía.</div></div></div>
+</div>
+
+<!-- ═══ COMERCIO ═══ -->
+<div class="sec" id="s-com">
+  <div class="sh"><div class="sh-i">🛒</div><div class="sh-t"><h2>Comercio Galáctico</h2><p>Compra barato en economías bajas, vende caro en economías altas</p></div></div>
+  <div class="tip gd"><div class="ti">📊</div><div class="tb2"><div class="tt">Economías de los sistemas estelares</div><div class="td">Cada sistema tiene un tipo de economía. Los sistemas <strong>💰💰💰 economía alta</strong> (Prospección, Ciencia, Manufactura) pagan más por los recursos. Siempre vende en sistemas de economía alta. Puedes ver el tipo de economía en el mapa galáctico antes de viajar.</div></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Producto</th><th>Precio aprox.</th><th>Dónde vender</th><th>Cómo obtener masivamente</th></tr></thead>
+    <tbody>
+      <tr><td>Platino</td><td><span class="b bpk">~35,000 u/ud</span></td><td>Terminales economía alta</td><td>Ciclo Plata+Oro → Platino en refinería</td></tr>
+      <tr><td>Oro</td><td><span class="b by">~22,000 u/ud</span></td><td>Cualquier terminal</td><td>Nódulos de Metal Amarillo o refinería</td></tr>
+      <tr><td>Cloro</td><td><span class="b bg">~6,000 u/ud</span></td><td>Cualquier terminal</td><td>Sal + Oxígeno en refinería masivamente</td></tr>
+      <tr><td>El Estrellador</td><td><span class="b bpk">~500,000+ u/stack</span></td><td>Cualquier terminal</td><td>Granja completa (ver sección Nutrientes)</td></tr>
+      <tr><td>Aleaciones (Aronio, Lemmio...)</td><td><span class="b by">~200,000 u/ud</span></td><td>Economías especializadas</td><td>Refinería Grande con minerales específicos</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══ HISTORIA ═══ -->
+<div class="sec" id="s-hist">
+  <div class="sh"><div class="sh-i">📖</div><div class="sh-t"><h2>Historia Principal — Las 3 Rutas</h2><p>NMS tiene 3 caminos narrativos que puedes seguir simultáneamente</p></div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div><div class="st">Despertares — El Tutorial</div><div class="sd">Repara tu nave en el planeta inicial con <strong>Polvo de Ferrita, Dihidrógeno y Ferrita Pura</strong>. Llega a la estación espacial. Aprende las mecánicas básicas del juego.</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">El Camino del Atlas</div><div class="sd">Visita las <strong>10 Interfaces Atlas</strong> distribuidas por la galaxia. Cada una te da una Piedra Atlas. Al completarlas puedes crear una nueva estrella. Esta es la ruta "del destino".</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">La Anomalía Espacial y el Lore</div><div class="sd">Descubre la historia de <strong>Polo y Nada</strong> en la Anomalía. Sus diálogos revelan los secretos del universo. Aprende el idioma alienígena interactuando con Korvax, Gek y Vy'keen en las estaciones.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">El Centro de la Galaxia — El Final</div><div class="sd">El objetivo final es llegar al <strong>centro de la galaxia</strong>. Al llegar, tu nave recibe mejoras gratis y comienzas en una <strong>nueva galaxia</strong> con todos tus recursos. Hay <strong>255 galaxias</strong> diferentes.</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ PORTALES ═══ -->
+<div class="sec" id="s-port">
+  <div class="sh"><div class="sh-i">🌀</div><div class="sh-t"><h2>Portales y Los 16 Glifos</h2><p>Viaja instantáneamente a cualquier coordenada de la galaxia</p></div></div>
+  <div class="tip pp"><div class="ti">🌀</div><div class="tb2"><div class="tt">¿Qué es un Portal?</div><div class="td">Estructuras antiguas en planetas que permiten viajar instantáneamente a cualquier coordenada galáctica. Necesitas los <strong>16 Glifos</strong> (el alfabeto portal) y <strong>Piedras Resonantes</strong> para cargarlo. Una vez activo, puedes visitar bases de otros jugadores del mundo entero.</div></div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div><div class="st">Encuentra un Portal</div><div class="sd">Usa una <strong>Baliza de Señal</strong> y selecciona "Monolito". Los monolitos te llevan a portales cercanos. También puedes preguntar a los alienígenas en estaciones sobre "Ruinas antiguas".</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">Consigue los 16 Glifos</div><div class="sd">Habla con <strong>Viajeros alienígenas</strong> en estaciones espaciales. Paga unidades para que te digan la ubicación de una Tumba de Viajero. Visita la tumba → 1 glifo. Repite 16 veces. Los Viajeros son los que usan trajes de espacio retro.</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">Carga el Portal con Piedras Resonantes</div><div class="sd">Cada glifo necesita un tipo diferente de <strong>Piedra Resonante</strong>. Se encuentran en minerales especiales cerca del portal. El juego te indica cuáles necesitas al intentar activarlo.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">Introduce las Coordenadas (12 glifos)</div><div class="sd">Con los 16 glifos desbloqueados, introduce la secuencia de 12 glifos de las coordenadas. La comunidad comparte coordenadas en <strong>Reddit (r/NMSCoordinateExchange)</strong> y Discord. ¡Bases increíbles te esperan!</div></div></div>
+  </div>
+</div>
+
+<!-- ═══ TIPOS DE NAVE ═══ -->
+<div class="sec" id="s-ship">
+  <div class="sh"><div class="sh-i">🛸</div><div class="sh-t"><h2>Cargueros y Frigatas</h2><p>Tu flota personal — la base de operaciones móvil</p></div></div>
+  <div class="cg2">
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--gold),transparent)"></div><div class="ic-ico">🚢</div><h4>Carguero Estelar</h4><p>Tu nave madre. Almacena recursos masivos, tiene <strong>refinería propia de 3 slots</strong>, sala de frigatas, plataformas de aterrizaje. Puede saltar a cualquier sistema donde estés. El primer carguero se obtiene gratis.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--purple),transparent)"></div><div class="ic-ico">🛥️</div><h4>Frigatas</h4><p>Naves medianas que envías en <strong>misiones automáticas</strong>: combate, exploración, comercio, minería. Regresan con recursos y unidades. Frigatas <strong>S-class</strong> = mejores recompensas. Envíalas cada vez que entres al juego.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--cyan),transparent)"></div><div class="ic-ico">🏭</div><h4>Refinería del Carguero</h4><p>El carguero tiene una refinería propia de <strong>3 ranuras</strong> disponible siempre en órbita. Es la forma más cómoda de refinar mientras exploras. Los recursos del carguero están siempre seguros.</p></div>
+    <div class="ic"><div class="ic-bar" style="background:linear-gradient(90deg,var(--green),transparent)"></div><div class="ic-ico">📦</div><h4>Almacenamiento Masivo</h4><p>El carguero tiene <strong>contenedores de almacenamiento</strong> donde guardar todo. Puedes asignar contenedores a categorías específicas. Es el "banco" más grande del juego. Crea múltiples cargueros para almacenamiento ilimitado.</p></div>
+  </div>
+</div>
+
+<!-- ═══ FAUNA ═══ -->
+<div class="sec" id="s-fau">
+  <div class="sh"><div class="sh-i">🦕</div><div class="sh-t"><h2>Fauna, Mascotas y Domesticación</h2><p>Haz amigos alienígenas, móntalos y obtén recursos de sus crías</p></div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">1</div><div><div class="st">Escanea al animal con el Visor de Análisis (L2)</div><div class="sd">El juego te muestra si el animal es <strong>herbívoro, carnívoro u omnívoro</strong>. Esto determina exactamente qué tipo de cebo necesitas fabricar en el Procesador de Nutrientes.</div></div></div>
+    <div class="step"><div class="sn">2</div><div><div class="st">Fabrica el cebo correcto</div><div class="sd"><strong>Herbívoros:</strong> Hecesio + ingrediente vegetal · <strong>Carnívoros:</strong> Mordita + ingrediente cárnico · <strong>Básico (todos):</strong> Carbono × 1 = Pienso para Criaturas (solo calma, no domestica).</div></div></div>
+    <div class="step"><div class="sn">3</div><div><div class="st">Dale el cebo avanzado y domestica</div><div class="sd">Con el cebo avanzado correcto aparece la opción de domesticar. Una vez domesticado puedes <strong>montarlo</strong> si es grande o <strong>adoptarlo como mascota permanente</strong> en tu colección.</div></div></div>
+    <div class="step"><div class="sn">4</div><div><div class="st">Obtén productos periódicos</div><div class="sd">Los animales domesticados producen recursos según su especie: <strong>Leche Fresca</strong> (para El Estrellador), <strong>Huevos, Lana, Carne</strong> o materiales raros. Los productos aparecen periódicamente en su menú.</div></div></div>
+    <div class="step"><div class="sn">5</div><div><div class="st">Cría y personaliza con Genes</div><div class="sd">Dos mascotas domesticadas pueden <strong>criar juntas</strong> y producir un Huevo. Modifica el huevo con <strong>Genes Aleatorios</strong> para crear criaturas únicas con aspecto personalizado. ¡Puedes compartirlas online!</div></div></div>
+  </div>
+  <div class="tip pk"><div class="ti">🥛</div><div class="tb2"><div class="tt">La Leche Fresca es clave para El Estrellador</div><div class="td">Sin animales que produzcan leche, no puedes hacer El Estrellador. Busca animales grandes herbívoros (parecidos a vacas alienígenas). Domestica y cría varios para producción constante de leche.</div></div></div>
+</div>
+
+<!-- ═══ TRUCOS ═══ -->
+<div class="sec" id="s-tru">
+  <div class="sh"><div class="sh-i">💡</div><div class="sh-t"><h2>Trucos, Secretos y Consejos Pro</h2><p>Los que los veteranos de miles de horas usan cada sesión de juego</p></div></div>
+  <div class="tip gd"><div class="ti">⭐</div><div class="tb2"><div class="tt">La Refinería es el banco más seguro del universo</div><div class="td">Los recursos dentro de cualquier refinería <strong>nunca se pierden al morir</strong>. Es el mejor "banco" del juego. Guarda tus materiales más valiosos ahí antes de explorar zonas peligrosas o combatir Centinelas.</div></div></div>
+  <div class="tip cy"><div class="ti">🚀</div><div class="tb2"><div class="tt">Motor de Pulso para encontrar eventos especiales</div><div class="td">Activa el Motor de Pulso (R2 en el espacio) y déjalo correr. Se desactiva automáticamente cerca de <strong>naves en peligro, asteroides y eventos espaciales</strong>. La mejor forma de encontrar Cargueros atacados para rescatar y obtener la primera nave grande gratis.</div></div></div>
+  <div class="tip gr"><div class="ti">💰</div><div class="tb2"><div class="tt">Misiones diarias de la Anomalía — nanitos fáciles</div><div class="td">Cada día hay misiones nuevas en la Anomalía Espacial. Las de <strong>Recuperación de Datos</strong> y <strong>Muestras Biológicas</strong> dan 300-600 nanitos cada una y son muy simples. Hazlas todos los días antes de explorar.</div></div></div>
+  <div class="tip pp"><div class="ti">🗺️</div><div class="tb2"><div class="tt">Balizas de Señal — encuentra todo rápidamente</div><div class="td">Fabrica <strong>Balizas de Señal</strong> en cualquier planeta para revelar: bases abandonadas, monolitos, portales, puertas de transmisión, etc. Son la forma más rápida de encontrar puntos de interés en planetas inexplorados.</div></div></div>
+  <div class="tip or"><div class="ti">🛸</div><div class="tb2"><div class="tt">Desmontar tecnología devuelve el 100% de recursos</div><div class="td">Si desmontas una mejora instalada en nave o exotraje, recuperas <strong>todos los recursos</strong> usados para fabricarla. Puedes reubicar mejoras sin perder nada. Muy útil cuando consigues una nave nueva.</div></div></div>
+  <div class="tip bl"><div class="ti">🌌</div><div class="tb2"><div class="tt">El Centro Galáctico da mejoras gratis de nave</div><div class="td">Al atravesar el centro de la galaxia, tu nave recibe <strong>mejoras aleatorias gratuitas</strong> además de iniciar en una nueva galaxia. Las mejoras pueden ser S-class. Vale el viaje aunque ya tengas todo mejorado.</div></div></div>
+  <div class="tip rd"><div class="ti">💀</div><div class="tb2"><div class="tt">Después de morir: recupera tu tumba primero</div><div class="td">Al morir dejas una <strong>tumba marcada en el mapa</strong> con todos los recursos que llevabas. Tienes tiempo <strong>ilimitado</strong> para volver y recogerlos. Nunca los pierdas — ve a buscar la tumba antes de hacer cualquier otra cosa.</div></div></div>
+</div>
+
+<!-- ═══ GLOSARIO ═══ -->
+<div class="sec" id="s-glos">
+  <div class="sh"><div class="sh-i">📚</div><div class="sh-t"><h2>Glosario de Términos</h2><p>Las palabras del universo NMS explicadas para que las entienda cualquiera</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>Término</th><th>¿Qué significa?</th></tr></thead>
+    <tbody>
+      <tr><td>Anomalía Espacial</td><td>Estación espacial especial donde viven Polo y Nada. Hub central del multijugador y compras con nanitos.</td></tr>
+      <tr><td>Datos Recuperados</td><td>Moneda especial del Nexo para comprar planos de construcción en la Anomalía.</td></tr>
+      <tr><td>Exotraje</td><td>Tu traje espacial personal. Lo mejoras para sobrevivir más y cargar más cosas.</td></tr>
+      <tr><td>Exonave / Buggy</td><td>Vehículo terrestre para moverse rápido por los planetas sin gastar jetpack.</td></tr>
+      <tr><td>Frigata</td><td>Nave mediana de tu flota que envías en misiones automáticas mientras juegas o estás offline.</td></tr>
+      <tr><td>Glifos</td><td>Los 16 símbolos del "idioma portal" — el abecedario para introducir coordenadas en portales.</td></tr>
+      <tr><td>Hiperpropulsión</td><td>Motor para saltar entre sistemas estelares. Consume Celdas de Curvatura como combustible.</td></tr>
+      <tr><td>Kelvin</td><td>Tu robot compañero. Lo encuentras al inicio del juego. Puedes enseñarle habilidades.</td></tr>
+      <tr><td>Korvax / Gek / Vy'keen</td><td>Las tres razas alienígenas: Korvax = robots filósofos · Gek = mercaderes pequeños · Vy'keen = guerreros.</td></tr>
+      <tr><td>Nanitos</td><td>Moneda premium para comprar mejoras de tecnología S-class y módulos especiales.</td></tr>
+      <tr><td>Nexo</td><td>Hub multijugador dentro de la Anomalía donde te reúnes con jugadores de todo el mundo.</td></tr>
+      <tr><td>Plano</td><td>Receta o manual para fabricar un objeto. Se desbloquean en terminales, estaciones o explorando.</td></tr>
+      <tr><td>Polo y Nada</td><td>Los dos personajes misteriosos de la Anomalía que guían la historia principal.</td></tr>
+      <tr><td>Sello de Alerta (⭐)</td><td>Nivel de peligro de los Centinelas. 1 estrella (mira) hasta 5 estrellas (máximo peligro con cazas).</td></tr>
+      <tr><td>Unidades</td><td>El dinero principal del juego para comprar naves, mejoras e intercambiar.</td></tr>
+      <tr><td>Viajero</td><td>Tu personaje en el juego. También son NPCs raros en estaciones que te dan glifos de portal.</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══ CONTROLES ═══ -->
+<div class="sec" id="s-ctrl">
+  <div class="sh"><div class="sh-i">🎮</div><div class="sh-t"><h2>Controles DualSense — PS5</h2><p>Todos los botones explicados de forma clara y simple</p></div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.2rem;margin-bottom:1.5rem">
+    <div>
+      <div style="font-size:.7rem;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;font-weight:800;margin-bottom:.8rem">🌍 EN EL PLANETA</div>
+      <div class="tw"><table><thead><tr><th>Botón</th><th>Acción</th></tr></thead><tbody>
+        <tr><td>⬡ Cuadrado</td><td>Recoger recursos / Interactuar</td></tr>
+        <tr><td>✕ Cruz</td><td>Confirmar / Saltar / Nadar</td></tr>
+        <tr><td>○ Círculo</td><td>Cancelar / Agacharse</td></tr>
+        <tr><td>△ Triángulo</td><td>Entrar a la nave</td></tr>
+        <tr><td>L2</td><td>Visor de Análisis (escanear)</td></tr>
+        <tr><td>R2</td><td>Láser de minado / Arma / Jetpack</td></tr>
+        <tr><td>L1</td><td>Menú rápido izquierdo</td></tr>
+        <tr><td>R1</td><td>Menú rápido derecho / Sprint</td></tr>
+        <tr><td>D-Pad ↑</td><td>Usar objeto seleccionado</td></tr>
+        <tr><td>Opciones</td><td>Inventario y menús completos</td></tr>
+        <tr><td>Touchpad</td><td>Mapa galáctico</td></tr>
+        <tr><td>L3</td><td>Sprint continuo</td></tr>
+      </tbody></table></div>
+    </div>
+    <div>
+      <div style="font-size:.7rem;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:800;margin-bottom:.8rem">🚀 EN LA NAVE</div>
+      <div class="tw"><table><thead><tr><th>Botón</th><th>Acción</th></tr></thead><tbody>
+        <tr><td>R2</td><td>Motor de Pulso (viaje rápido)</td></tr>
+        <tr><td>L2</td><td>Escudos / Frenos</td></tr>
+        <tr><td>⬡ Cuadrado</td><td>Armas de la nave (Photon Cannon)</td></tr>
+        <tr><td>✕ Cruz</td><td>Aceleración / Despegar</td></tr>
+        <tr><td>△ Triángulo</td><td>Salir de la nave</td></tr>
+        <tr><td>○ Círculo</td><td>Maniobra evasiva / Barrel Roll</td></tr>
+        <tr><td>R1</td><td>Motor de Hiperpropulsión</td></tr>
+        <tr><td>L1</td><td>Apuntar / Bloquear objetivo</td></tr>
+        <tr><td>D-Pad ↓</td><td>Aterrizar automáticamente</td></tr>
+        <tr><td>Touchpad</td><td>Mapa galáctico</td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+  <div class="tip cy"><div class="ti">🎮</div><div class="tb2"><div class="tt">El DualSense hace NMS más inmersivo</div><div class="td">NMS usa <strong>Gatillos Adaptativos</strong> (resistencia al disparar y jetpack) y <strong>Vibración Háptica</strong> (tormentas, temperatura extrema, recoger recursos, turbulencias al volar). ¡Una de las mejores implementaciones de DualSense en PS5!</div></div></div>
+</div>
+
+</main>
+
 <script>
-// ═══════════════════════════════════════════════════════════
-// RECETAS — NOMBRES OFICIALES EN ESPAÑOL (NMS Wiki ES)
-// i1/q1=ingrediente1/cantidad, i2/q2, i3/q3, r=resultado, qr=cantidad resultado, ref=refinadora
-// ═══════════════════════════════════════════════════════════
-const R=[
-  // CARBONO / CARBONO CONDENSADO
+// ══════════════════════════════════════
+// HAMBURGER MENU
+// ══════════════════════════════════════
+const hb=document.getElementById('hb');
+const sb=document.getElementById('sb');
+const ov=document.getElementById('ov');
+const mn=document.getElementById('mn');
+let isOpen=window.innerWidth>900;
+
+function setSB(open){
+  isOpen=open;
+  hb.classList.toggle('open',open);
+  if(window.innerWidth<=900){
+    sb.classList.toggle('open',open);
+    ov.style.display=open?'block':'none';
+    mn.classList.remove('wide');
+  } else {
+    if(open){sb.classList.remove('closed');mn.classList.remove('wide');}
+    else{sb.classList.add('closed');mn.classList.add('wide');}
+    ov.style.display='none';
+  }
+}
+hb.addEventListener('click',()=>setSB(!isOpen));
+ov.addEventListener('click',()=>setSB(false));
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>900){ov.style.display='none';sb.classList.remove('open');}
+});
+if(window.innerWidth<=900) setSB(false);
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const sec=document.getElementById('s-'+id);
+  if(sec) sec.classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.dataset.s===id)n.classList.add('on');});
+  document.getElementById('srSec').style.display='none';
+  document.getElementById('gs').value='';
+  document.getElementById('gx').style.display='none';
+  document.getElementById('gac').classList.remove('open');
+  window.scrollTo(0,0);
+  if(window.innerWidth<=900) setSB(false);
+}
+document.querySelectorAll('.ni').forEach(n=>n.addEventListener('click',()=>go(n.dataset.s)));
+document.querySelectorAll('.ic[data-g],.ht[data-g]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.g)));
+
+// ══════════════════════════════════════
+// RECIPES DB
+// ══════════════════════════════════════
+const RCP=[
   {i1:"Carbono condensado",q1:1,r:"Carbono",qr:2,ref:"Todas"},
   {i1:"Carbono",q1:1,r:"Carbono condensado",qr:1,ref:"Todas"},
-  {i1:"Carbono",q1:2,r:"Carbono condensado",qr:1,ref:"Todas"},
   {i1:"Carne de cactus",q1:1,r:"Carbono",qr:2,ref:"Todas"},
   {i1:"Raíz gamma",q1:1,r:"Carbono",qr:2,ref:"Todas"},
   {i1:"Moho fúngico",q1:1,r:"Carbono",qr:2,ref:"Todas"},
@@ -112,27 +757,20 @@ const R=[
   {i1:"Metano",q1:1,r:"Carbono condensado",qr:1,ref:"Todas"},
   {i1:"Gas de incineración",q1:1,r:"Carbono condensado",qr:2,ref:"Todas"},
   {i1:"Carbono",q1:2,i2:"Oxígeno",q2:2,r:"Carbono condensado",qr:5,ref:"Todas"},
-  {i1:"Carbono condensado",q1:1,i2:"Oxígeno",q2:2,r:"Carbono condensado",qr:6,ref:"Todas"},
   {i1:"Metano",q1:1,i2:"Carbono",q2:1,r:"Carbono condensado",qr:3,ref:"Todas"},
-  {i1:"Coprita",q1:1,i2:"Carbono condensado",q2:1,r:"Carbono condensado",qr:3,ref:"Todas"},
-  // OXÍGENO
   {i1:"Radón",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
   {i1:"Nitrógeno",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
   {i1:"Sulfurina",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
   {i1:"Metano",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
   {i1:"Amoníaco",q1:1,r:"Oxígeno",qr:1,ref:"Todas"},
   {i1:"Saco de algas",q1:1,i2:"Carbono",q2:1,r:"Oxígeno",qr:2,ref:"Todas"},
-  {i1:"Saco de algas",q1:1,i2:"Carbono condensado",q2:1,r:"Oxígeno",qr:2,ref:"Todas"},
-  // POLVO DE FERRITA
   {i1:"Ferrita pura",q1:1,i2:"Oxígeno",q2:1,r:"Polvo de ferrita",qr:4,ref:"Todas"},
   {i1:"Ferrita imantada",q1:1,r:"Polvo de ferrita",qr:1,ref:"Todas"},
-  // FERRITA PURA
   {i1:"Polvo de ferrita",q1:1,r:"Ferrita pura",qr:1,ref:"Todas"},
   {i1:"Ferrita imantada",q1:1,r:"Ferrita pura",qr:2,ref:"Todas"},
   {i1:"Pirita",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
   {i1:"Amoníaco",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
   {i1:"Gas de incineración",q1:1,i2:"Polvo de ferrita",q2:1,r:"Ferrita pura",qr:2,ref:"Todas"},
-  // FERRITA IMANTADA
   {i1:"Ferrita pura",q1:1,r:"Ferrita imantada",qr:1,ref:"Todas"},
   {i1:"Polvo de ferrita",q1:1,i2:"Carbono",q2:1,r:"Ferrita imantada",qr:1,ref:"Todas"},
   {i1:"Polvo de ferrita",q1:1,i2:"Carbono condensado",q2:1,r:"Ferrita imantada",qr:2,ref:"Todas"},
@@ -141,55 +779,34 @@ const R=[
   {i1:"Platino",q1:1,i2:"Oxígeno",q2:1,r:"Ferrita imantada",qr:10,ref:"Todas"},
   {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Plata",q3:1,r:"Ferrita imantada",qr:5,ref:"Grande"},
   {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Oro",q3:1,r:"Ferrita imantada",qr:8,ref:"Grande"},
-  {i1:"Polvo de ferrita",q1:1,i2:"Ferrita pura",q2:1,i3:"Platino",q3:1,r:"Ferrita imantada",qr:12,ref:"Grande"},
-  // DIHIDRÓGENO / GRASA DE DIHIDRÓGENO
   {i1:"Tritio",q1:5,r:"Dihidrógeno",qr:1,ref:"Todas"},
   {i1:"Grasa de dihidrógeno",q1:1,r:"Dihidrógeno",qr:40,ref:"Todas"},
   {i1:"Residuo aceitoso",q1:1,r:"Dihidrógeno",qr:20,ref:"Todas"},
   {i1:"Dihidrógeno",q1:30,r:"Grasa de dihidrógeno",qr:1,ref:"Todas"},
-  {i1:"Dihidrógeno",q1:50,i2:"Polvo de ferrita",q2:1,r:"Grasa de dihidrógeno",qr:1,ref:"Todas"},
-  // DEUTERIO
   {i1:"Dihidrógeno",q1:1,i2:"Polvo de ferrita",q2:1,r:"Deuterio",qr:1,ref:"Media/Grande"},
-  {i1:"Dihidrógeno",q1:1,i2:"Ferrita pura",q2:1,r:"Deuterio",qr:1,ref:"Media/Grande"},
-  // SODIO / NITRATO DE SODIO
   {i1:"Nitrato de sodio",q1:1,r:"Sodio",qr:2,ref:"Todas"},
   {i1:"Bulbo de médula",q1:1,r:"Sodio",qr:1,ref:"Todas"},
-  {i1:"Bulbo de médula",q1:1,i2:"Carbono",q2:1,r:"Sodio",qr:2,ref:"Todas"},
-  {i1:"Bulbo de médula",q1:1,i2:"Carbono condensado",q2:1,r:"Sodio",qr:2,ref:"Todas"},
   {i1:"Sodio",q1:2,r:"Nitrato de sodio",qr:1,ref:"Todas"},
   {i1:"Sodio",q1:1,i2:"Carbono",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
   {i1:"Sodio",q1:1,i2:"Carbono condensado",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
   {i1:"Sodio",q1:1,i2:"Oxígeno",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
   {i1:"Nitrato de sodio",q1:1,i2:"Oxígeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
-  {i1:"Sodio",q1:1,i2:"Púgneo",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
-  {i1:"Nitrato de sodio",q1:1,i2:"Púgneo",q2:1,r:"Nitrato de sodio",qr:3,ref:"Todas"},
   {i1:"Nitrógeno",q1:1,i2:"Sodio",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
-  {i1:"Nitrógeno",q1:1,i2:"Polvo de ferrita",q2:1,r:"Nitrato de sodio",qr:1,ref:"Todas"},
   {i1:"Ferrita pura",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
-  {i1:"Ferrita imantada",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:3,ref:"Todas"},
-  {i1:"Nitrato de sodio",q1:1,i2:"Nitrógeno",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
-  {i1:"Carbono condensado",q1:1,i2:"Sodio",q2:1,r:"Nitrato de sodio",qr:2,ref:"Todas"},
   {i1:"Cristal de sulfuro",q1:1,r:"Nitrato de sodio",qr:50,ref:"Todas"},
-  // SAL / CLORO
   {i1:"Cloro",q1:1,r:"Sal",qr:2,ref:"Todas"},
-  {i1:"Dihidrógeno",q1:1,i2:"Oxígeno",q2:1,r:"Sal",qr:1,ref:"Todas"},
   {i1:"Sal",q1:1,r:"Cloro",qr:1,ref:"Todas"},
   {i1:"Sal",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Cloro",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:6,ref:"Todas"},
-  {i1:"Saco de algas",q1:1,i2:"Oxígeno",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Radón",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Nitrógeno",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Sulfurina",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Amoníaco",q1:1,i2:"Sal",q2:1,r:"Cloro",qr:2,ref:"Todas"},
   {i1:"Sal",q1:1,i2:"Cloro",q2:1,i3:"Oxígeno",q3:1,r:"Cloro",qr:10,ref:"Grande"},
-  // COBALTO / COBALTO IONIZADO
   {i1:"Cobalto ionizado",q1:1,r:"Cobalto",qr:2,ref:"Todas"},
   {i1:"Cobalto",q1:2,r:"Cobalto ionizado",qr:1,ref:"Todas"},
   {i1:"Cobalto",q1:1,i2:"Oxígeno",q2:1,r:"Cobalto ionizado",qr:1,ref:"Todas"},
-  {i1:"Cobalto ionizado",q1:1,i2:"Oxígeno",q2:2,r:"Cobalto ionizado",qr:6,ref:"Todas"},
-  {i1:"Bulbo de médula",q1:1,i2:"Púgneo",q2:1,r:"Cobalto ionizado",qr:1,ref:"Todas"},
   {i1:"Mordita",q1:1,i2:"Nitrato de sodio",q2:1,r:"Cobalto ionizado",qr:4,ref:"Todas"},
-  // METAL CROMÁTICO
   {i1:"Cobre",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
   {i1:"Cadmio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
   {i1:"Emerilio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
@@ -202,91 +819,53 @@ const R=[
   {i1:"Ferrita pura",q1:1,i2:"Oxígeno",q2:1,r:"Metal cromático",qr:2,ref:"Todas"},
   {i1:"Solanio",q1:1,r:"Metal cromático",qr:1,ref:"Todas"},
   {i1:"Solanio",q1:2,i2:"Cobalto",q2:1,r:"Metal cromático",qr:3,ref:"Todas"},
-  // COBRE / CADMIO / EMERILIO / INDIO (ciclos de multiplicación)
   {i1:"Cobre",q1:1,i2:"Metal cromático",q2:1,r:"Cobre",qr:2,ref:"Todas"},
   {i1:"Cadmio",q1:1,i2:"Metal cromático",q2:1,r:"Cadmio",qr:2,ref:"Todas"},
   {i1:"Emerilio",q1:1,i2:"Metal cromático",q2:1,r:"Emerilio",qr:2,ref:"Todas"},
   {i1:"Indio",q1:1,i2:"Metal cromático",q2:1,r:"Indio",qr:2,ref:"Todas"},
-  // PLATA / ORO / PLATINO
   {i1:"Oro",q1:1,r:"Plata",qr:2,ref:"Todas"},
-  {i1:"Plata",q1:1,i2:"Oxígeno",q2:1,r:"Parafinio",qr:2,ref:"Todas"},
   {i1:"Platino",q1:1,r:"Oro",qr:2,ref:"Todas"},
-  {i1:"Oro",q1:1,i2:"Oxígeno",q2:1,r:"Pirita",qr:2,ref:"Todas"},
   {i1:"Plata",q1:1,i2:"Oro",q2:1,r:"Platino",qr:1,ref:"Todas"},
   {i1:"Geodesita",q1:1,r:"Platino",qr:1,ref:"Todas"},
-  {i1:"Iridesita",q1:1,r:"Platino",qr:1,ref:"Todas"},
   {i1:"Lemio",q1:1,r:"Oro",qr:1,ref:"Todas"},
-  {i1:"Oro magno",q1:1,r:"Oro",qr:1,ref:"Todas"},
-  {i1:"Perla viva",q1:1,r:"Oro",qr:1,ref:"Todas"},
   {i1:"Grantino",q1:1,r:"Oro",qr:1,ref:"Todas"},
   {i1:"Mordita",q1:1,i2:"Púgneo",q2:1,r:"Oro",qr:1,ref:"Todas"},
-  {i1:"Hecesio",q1:1,i2:"Pringue residual",q2:1,r:"Oro",qr:1,ref:"Todas"},
   {i1:"Aronio",q1:1,r:"Plata",qr:1,ref:"Todas"},
   {i1:"Bronce oscuro",q1:1,r:"Plata",qr:1,ref:"Todas"},
   {i1:"Henox",q1:1,r:"Plata",qr:1,ref:"Todas"},
+  {i1:"Plata",q1:1,i2:"Oxígeno",q2:1,r:"Parafinio",qr:2,ref:"Todas"},
+  {i1:"Oro",q1:1,i2:"Oxígeno",q2:1,r:"Pirita",qr:2,ref:"Todas"},
   {i1:"Polvo de ferrita",q1:1,i2:"Oxígeno",q2:1,i3:"Emerilio",q3:1,r:"Oro",qr:10,ref:"Grande"},
-  {i1:"Polvo de ferrita",q1:1,i2:"Oxígeno",q2:1,i3:"Emerilio",q3:1,r:"Platino",qr:10,ref:"Grande"},
-  // GASES ATMOSFÉRICOS
   {i1:"Radón",q1:1,i2:"Oxígeno",q2:1,r:"Nitrógeno",qr:1,ref:"Todas"},
-  {i1:"Radón",q1:1,i2:"Metal cromático",q2:1,r:"Nitrógeno",qr:1,ref:"Todas"},
   {i1:"Nitrógeno",q1:1,i2:"Oxígeno",q2:1,r:"Sulfurina",qr:1,ref:"Todas"},
-  {i1:"Nitrógeno",q1:1,i2:"Metal cromático",q2:1,r:"Sulfurina",qr:1,ref:"Todas"},
   {i1:"Sulfurina",q1:1,i2:"Oxígeno",q2:1,r:"Radón",qr:1,ref:"Todas"},
-  {i1:"Sulfurina",q1:1,i2:"Metal cromático",q2:1,r:"Radón",qr:1,ref:"Todas"},
-  {i1:"Azufre",q1:1,i2:"Metal cromático",q2:1,r:"Radón",qr:1,ref:"Todas"},
-  // AMONÍACO
   {i1:"Nitrógeno",q1:1,i2:"Dihidrógeno",q2:1,r:"Amoníaco",qr:1,ref:"Media/Grande"},
   {i1:"Parafinio",q1:2,i2:"Polvo de ferrita",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
-  {i1:"Parafinio",q1:1,i2:"Ferrita pura",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
   {i1:"Moho fúngico",q1:2,i2:"Sal",q2:1,r:"Amoníaco",qr:1,ref:"Todas"},
-  // PIRITA
   {i1:"Oro",q1:1,r:"Pirita",qr:2,ref:"Todas"},
-  {i1:"Oro",q1:1,i2:"Oxígeno",q2:1,r:"Pirita",qr:2,ref:"Todas"},
   {i1:"Carne de cactus",q1:1,i2:"Sal",q2:1,r:"Pirita",qr:1,ref:"Todas"},
-  {i1:"Uranio",q1:1,i2:"Polvo de ferrita",q2:1,r:"Pirita",qr:1,ref:"Todas"},
-  // PARAFINIO
   {i1:"Pirita",q1:1,i2:"Polvo de ferrita",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
   {i1:"Sulfurina",q1:1,i2:"Polvo de ferrita",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
-  {i1:"Bulbo estelar",q1:1,i2:"Sal",q2:1,r:"Parafinio",qr:1,ref:"Todas"},
-  {i1:"Plata",q1:1,i2:"Oxígeno",q2:1,r:"Parafinio",qr:2,ref:"Todas"},
-  // DIOXITA
   {i1:"Amoníaco",q1:1,i2:"Polvo de ferrita",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
   {i1:"Carbono",q1:1,i2:"Nitrato de sodio",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
-  {i1:"Carbono condensado",q1:1,i2:"Nitrato de sodio",q2:1,r:"Dioxita",qr:2,ref:"Todas"},
   {i1:"Cristal de escarcha",q1:1,i2:"Sal",q2:1,r:"Dioxita",qr:1,ref:"Todas"},
-  // URANIO
   {i1:"Radón",q1:1,i2:"Dihidrógeno",q2:1,r:"Uranio",qr:1,ref:"Todas"},
   {i1:"Fósforo",q1:2,i2:"Polvo de ferrita",q2:1,r:"Uranio",qr:1,ref:"Todas"},
-  {i1:"Fósforo",q1:2,i2:"Ferrita pura",q2:1,r:"Uranio",qr:1,ref:"Todas"},
   {i1:"Raíz gamma",q1:2,i2:"Sal",q2:1,r:"Uranio",qr:1,ref:"Todas"},
   {i1:"Polvo de ferrita",q1:1,i2:"Radón",q2:1,r:"Uranio",qr:1,ref:"Todas"},
-  {i1:"Radón",q1:1,i2:"Ferrita pura",q2:1,r:"Uranio",qr:2,ref:"Todas"},
-  {i1:"Radón",q1:1,i2:"Ferrita imantada",q2:1,r:"Uranio",qr:3,ref:"Todas"},
-  // FÓSFORO
   {i1:"Uranio",q1:1,i2:"Polvo de ferrita",q2:2,r:"Fósforo",qr:1,ref:"Todas"},
-  // MORDITA
   {i1:"Dihidrógeno",q1:1,i2:"Carbono condensado",q2:1,r:"Mordita",qr:1,ref:"Todas"},
   {i1:"Carbono",q1:1,i2:"Moho fúngico",q2:1,r:"Mordita",qr:1,ref:"Todas"},
-  {i1:"Carbono condensado",q1:1,i2:"Moho fúngico",q2:1,r:"Mordita",qr:2,ref:"Todas"},
   {i1:"Coprita",q1:3,r:"Mordita",qr:2,ref:"Todas"},
-  // BULBO DE MÉDULA
   {i1:"Mordita",q1:1,i2:"Sodio",q2:2,r:"Bulbo de médula",qr:3,ref:"Todas"},
   {i1:"Mordita",q1:1,i2:"Nitrato de sodio",q2:1,r:"Bulbo de médula",qr:4,ref:"Todas"},
   {i1:"Cobalto",q1:1,i2:"Nitrógeno",q2:1,r:"Bulbo de médula",qr:1,ref:"Todas"},
-  // MOHO FÚNGICO
   {i1:"Amoníaco",q1:1,i2:"Nitrógeno",q2:1,r:"Moho fúngico",qr:1,ref:"Todas"},
-  // HECESIO
   {i1:"Nitrógeno",q1:1,i2:"Sulfurina",q2:1,r:"Hecesio",qr:1,ref:"Todas"},
-  // CARNE DE CACTUS
   {i1:"Pirita",q1:2,i2:"Oxígeno",q2:1,r:"Carne de cactus",qr:1,ref:"Todas"},
-  {i1:"Pirita",q1:2,i2:"Azufre",q2:1,r:"Carne de cactus",qr:1,ref:"Todas"},
-  {i1:"Pirita",q1:1,i2:"Carne de cactus",q2:1,r:"Carne de cactus",qr:2,ref:"Todas"},
-  // RAÍZ GAMMA / POLVO DE GAMMA
   {i1:"Polvo de gamma",q1:2,r:"Raíz gamma",qr:1,ref:"Todas"},
   {i1:"Raíz gamma",q1:1,r:"Polvo de gamma",qr:2,ref:"Todas"},
-  // POLVO DE GRAVITINO
   {i1:"Faecio",q1:1,r:"Polvo de gravitino",qr:1,ref:"Todas"},
-  // NANITOS
   {i1:"Polvo de gravitino",q1:1,r:"Nanitos",qr:50,ref:"Todas"},
   {i1:"Huevo de larva",q1:1,r:"Nanitos",qr:65,ref:"Todas"},
   {i1:"Residuo tóxico",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
@@ -300,20 +879,12 @@ const R=[
   {i1:"Cristal de ferrocos",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
   {i1:"Cristal de solanas",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
   {i1:"Cristal de ruinas",q1:1,r:"Nanitos",qr:20,ref:"Todas"},
-  {i1:"Faecio",q1:1,i2:"Hexita",q2:1,r:"Nanitos",qr:1,ref:"Todas"},
-  // GAS DE INCINERACIÓN
   {i1:"Oxígeno",q1:1,i2:"Carbono",q2:1,r:"Gas de incineración",qr:2,ref:"Todas"},
-  {i1:"Oxígeno",q1:2,i2:"Carbono",q2:1,r:"Gas de incineración",qr:3,ref:"Todas"},
-  // POLVO DE SILICATO / VIDRIO
   {i1:"Vidrio",q1:1,r:"Polvo de silicato",qr:2,ref:"Todas"},
   {i1:"Polvo de silicato",q1:2,r:"Vidrio",qr:1,ref:"Todas"},
-  {i1:"Polvo de silicato",q1:1,i2:"Carbono",q2:1,r:"Vidrio",qr:1,ref:"Todas"},
-  // AZUFRE
   {i1:"Dioxita",q1:2,r:"Azufre",qr:1,ref:"Todas"},
   {i1:"Pirita",q1:2,r:"Azufre",qr:1,ref:"Todas"},
-  // ALEACIONES AVANZADAS (refinadora grande)
   {i1:"Parafinio",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Tritio",q3:30,r:"Aronio",qr:1,ref:"Grande"},
-  {i1:"Parafinio",q1:30,i2:"Cobalto",q2:60,i3:"Oro",q3:10,r:"Aronio",qr:1,ref:"Grande"},
   {i1:"Pirita",q1:30,i2:"Ferrita pura",q2:60,i3:"Oro",q3:10,r:"Bronce oscuro",qr:1,ref:"Grande"},
   {i1:"Amoníaco",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Plata",q3:20,r:"Gerox",qr:1,ref:"Grande"},
   {i1:"Dioxita",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Oro",q3:10,r:"Lemmio",qr:1,ref:"Grande"},
@@ -321,83 +892,196 @@ const R=[
   {i1:"Fósforo",q1:30,i2:"Cobalto ionizado",q2:30,i3:"Plata",q3:20,r:"Henox",qr:1,ref:"Grande"},
   {i1:"Carbono condensado",q1:25,i2:"Nitrato de sodio",q2:5,i3:"Metal cromático",q3:250,r:"Célula de curvatura",qr:1,ref:"Grande"},
   {i1:"Carbono",q1:50,i2:"Nitrato de sodio",q2:5,i3:"Metal cromático",q3:250,r:"Célula de curvatura",qr:1,ref:"Grande"},
-  {i1:"Polvo de ferrita",q1:10,i2:"Plata",q2:10,i3:"Sodio",q3:10,r:"Batería de iones",qr:1,ref:"Grande"},
 ];
 
-// ═══════════════════════════════════════════════════════════
-// ÍNDICE
-// ═══════════════════════════════════════════════════════════
-const allNames=new Set();
-R.forEach(r=>{allNames.add(r.r);allNames.add(r.i1);if(r.i2)allNames.add(r.i2);if(r.i3)allNames.add(r.i3);});
-const RESOURCES=[...allNames].sort((a,b)=>a.localeCompare(b,'es'));
-
-// DOM
-const searchEl=document.getElementById('search');
-const clearBtn=document.getElementById('clearBtn');
-const autoEl=document.getElementById('autocomplete');
-const resultsEl=document.getElementById('results');
-const hdrEl=document.getElementById('resultsHeader');
-let acIdx=-1;
+// Index
+const allN=new Set();
+RCP.forEach(r=>{allN.add(r.r);allN.add(r.i1);if(r.i2)allN.add(r.i2);if(r.i3)allN.add(r.i3);});
+const RES=[...allN].sort((a,b)=>a.localeCompare(b,'es'));
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+function sug(q){return!q?[]:RES.filter(r=>norm(r).includes(norm(q))).slice(0,12);}
+function rCls(r){return r&&r.includes("Grande")?"rbg":r&&r.includes("Media")?"rbm":"rbt";}
+function chip(n,q,res=false){return`<div class="ing${res?' res':''}"><span class="n">${n}</span><span class="q">×${q}</span></div>`;}
 
-function sugg(q){return !q?[]:RESOURCES.filter(r=>norm(r).includes(norm(q))).slice(0,12);}
-
-function renderAC(list){
-  if(!list.length){autoEl.classList.remove('show');return;}
-  autoEl.innerHTML=list.map(s=>`<div class="autocomplete-item" data-v="${s}">${s}</div>`).join('');
-  autoEl.classList.add('show');acIdx=-1;
-}
-
-function refCls(r){if(!r||r==="Todas")return"todas";if(r.includes("Grande"))return"grande";return"media";}
-
-function chip(name,qty,isRes=false){
-  return`<div class="ingredient${isRes?' result':''}"><span class="iname">${name}</span><span class="qty">×${qty}</span></div>`;
-}
-
-function doSearch(query){
-  if(!query){resultsEl.innerHTML='';hdrEl.style.display='none';showHint();return;}
-  const nq=norm(query);
-  const found=R.filter(r=>norm(r.r).includes(nq));
-  hdrEl.style.display='block';
-  if(!found.length){
-    hdrEl.innerHTML=`Sin resultados para <span>"${query}"</span>`;
-    resultsEl.innerHTML=`<div class="no-results"><span class="icon">⬡</span>No hay recetas para obtener "<strong>${query}</strong>".<br>Verifica la ortografía o prueba con un nombre parcial.</div>`;
-    return;
+function drawRcp(cont,hdr,q){
+  if(!q){
+    cont.innerHTML='<div class="hint"><span class="hi">⬡</span>Escribe el nombre de cualquier recurso<br>para ver <em>todas las formas de obtenerlo</em> en la refinería<br><br>Ej: <em>Ferrita imantada · Metal cromático · Nanitos · Cloro</em></div>';
+    if(hdr)hdr.style.display='none';return;
   }
-  hdrEl.innerHTML=`<span>${found.length}</span> receta${found.length>1?'s':''} para obtener <span>"${found[0].r}"</span>`;
-  resultsEl.innerHTML=found.map(r=>{
-    const i2=r.i2?`<span class="plus">+</span>${chip(r.i2,r.q2)}`:'';
-    const i3=r.i3?`<span class="plus">+</span>${chip(r.i3,r.q3)}`:'';
-    return`<div class="recipe-card"><div class="recipe-row">${chip(r.i1,r.q1)}${i2}${i3}<span class="arrow">→</span>${chip(r.r,r.qr,true)}<span class="refinery-badge ${refCls(r.ref)}">${r.ref||'Todas'}</span></div></div>`;
+  const nq=norm(q);
+  const f=RCP.filter(r=>norm(r.r).includes(nq));
+  if(hdr){hdr.style.display='block';hdr.innerHTML=f.length?`<b style="color:var(--cyan)">${f.length}</b> receta${f.length>1?'s':''} para obtener <b style="color:var(--cyan)">"${f[0]?.r}"</b>`:`Sin resultados para <b>"${q}"</b>`;}
+  if(!f.length){cont.innerHTML=`<div class="nores"><span>🔭</span>No hay recetas para "<strong>${q}</strong>".<br>Prueba con otro nombre o escribe solo una parte.</div>`;return;}
+  cont.innerHTML=f.map(r=>{
+    const i2=r.i2?`<span class="pls">+</span>${chip(r.i2,r.q2)}`:'';
+    const i3=r.i3?`<span class="pls">+</span>${chip(r.i3,r.q3)}`:'';
+    return`<div class="rc"><div class="rr">${chip(r.i1,r.q1)}${i2}${i3}<span class="arr">→</span>${chip(r.r,r.qr,true)}<span class="rb ${rCls(r.ref)}">${r.ref}</span></div></div>`;
   }).join('');
 }
 
-function showHint(){
-  resultsEl.innerHTML=`<div class="hint"><span class="big">⬡</span>Escribe el nombre de cualquier recurso<br>para ver <em>todas las formas de obtenerlo</em><br>en la refinería.<br><br><em>Ej: Ferrita imantada · Metal cromático · Nanitos · Cloro · Nitrato de sodio</em></div>`;
+// ══════════════════════════════════════
+// AC HELPER
+// ══════════════════════════════════════
+function setupAC(inp,ac,onQ,onSel){
+  let idx=-1;
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim();
+    const s=sug(q);
+    if(s.length){ac.innerHTML=s.map(x=>`<div class="aci" data-v="${x}"><span class="aci-dot"></span>${x}</div>`).join('');ac.classList.add('open');}
+    else ac.classList.remove('open');
+    onQ(q);
+  });
+  inp.addEventListener('keydown',e=>{
+    const its=ac.querySelectorAll('.aci');
+    if(e.key==='ArrowDown'){idx=Math.min(idx+1,its.length-1);its.forEach((el,i)=>el.classList.toggle('hi',i===idx));}
+    else if(e.key==='ArrowUp'){idx=Math.max(idx-1,-1);its.forEach((el,i)=>el.classList.toggle('hi',i===idx));}
+    else if(e.key==='Enter'&&idx>=0&&its[idx]){const v=its[idx].dataset.v;inp.value=v;ac.classList.remove('open');onSel(v);idx=-1;}
+    else if(e.key==='Escape'){ac.classList.remove('open');}
+  });
+  ac.addEventListener('click',e=>{const it=e.target.closest('.aci');if(!it)return;inp.value=it.dataset.v;ac.classList.remove('open');onSel(it.dataset.v);});
 }
-showHint();
 
-searchEl.addEventListener('input',()=>{
-  const q=searchEl.value.trim();
-  clearBtn.style.display=q?'block':'none';
-  renderAC(sugg(q));
-  if(!q){showHint();hdrEl.style.display='none';return;}
-  doSearch(q);
+// Refinería search
+const rs=document.getElementById('rs'),rac=document.getElementById('rac'),rx=document.getElementById('rx'),rhdr=document.getElementById('rhdr'),rres=document.getElementById('rres');
+setupAC(rs,rac,q=>{rx.style.display=q?'block':'none';drawRcp(rres,rhdr,q);},v=>{rx.style.display='block';drawRcp(rres,rhdr,v);});
+rx.addEventListener('click',()=>{rs.value='';rx.style.display='none';rac.classList.remove('open');drawRcp(rres,rhdr,'');});
+
+// Global search
+const gs=document.getElementById('gs'),gac=document.getElementById('gac'),gx=document.getElementById('gx'),srSec=document.getElementById('srSec'),srHdr=document.getElementById('srHdr'),srRes=document.getElementById('srRes');
+setupAC(gs,gac,q=>{
+  gx.style.display=q?'block':'none';
+  if(q){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));srSec.style.display='block';drawRcp(srRes,srHdr,q);}
+  else{srSec.style.display='none';document.getElementById('s-inicio').classList.add('on');}
+},v=>{gx.style.display='block';document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));srSec.style.display='block';drawRcp(srRes,srHdr,v);});
+gx.addEventListener('click',()=>{gs.value='';gx.style.display='none';gac.classList.remove('open');srSec.style.display='none';document.getElementById('s-inicio').classList.add('on');});
+
+document.addEventListener('click',e=>{if(!e.target.closest('.sw')&&!e.target.closest('.rsw')){gac.classList.remove('open');rac.classList.remove('open');}});
+
+// ══════════════════════════════════════
+// NUTRIENT PROCESSOR
+// ══════════════════════════════════════
+const NP=[
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Carbono → Pienso para Criaturas",
+   ing:[{n:"Carbono",q:"×1"}],res:"Pienso para Criaturas ×1",
+   use:"Cebo básico universal que funciona con <strong>cualquier animal</strong>. Al dárselo el animal se alegra y produce Hecesio (excrementos). No domestica completamente, solo calma criaturas feroces y las hace amigables temporalmente.",slots:1},
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Metal Cromático → Huevos de Silicio",
+   ing:[{n:"Metal Cromático",q:"×1"}],res:"Huevos de Silicio ×1",
+   use:"Proteína alienígena de silicio. Ingrediente esencial para las <strong>Natillas Estelares</strong>, que es uno de los dos componentes finales de El Estrellador. Se obtiene procesando Metal Cromático (Cobre, Cadmio, Emerilio o Indio refinados).",slots:1},
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Hecesio → Levadura Silvestre",
+   ing:[{n:"Hecesio",q:"×1"}],res:"Levadura Silvestre ×1",
+   use:"Agente fermentador galáctico. Es el ingrediente que hace subir la masa del Estrellador. Sin levadura no hay masa, sin masa no hay Dónut Lumpen, sin Dónut no hay Estrellador. Se cultiva de la Flor de Pudretripas (~2h).",slots:1},
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Cristal de Escarcha → Granos de Vidrio",
+   ing:[{n:"Cristal de Escarcha",q:"×1"}],res:"Granos de Vidrio ×1",
+   use:"Ingrediente que aporta textura y estructura a la Masa del Estrellador. El Cristal de Escarcha se cultiva con <strong>Heliantemos</strong> (~1 hora de crecimiento, la planta más rápida del juego). Con 25 plantas tienes producción eficiente.",slots:1},
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Carne de Cactus → Néctar de Cactus",
+   ing:[{n:"Carne de Cactus",q:"×1"}],res:"Néctar de Cactus ×1",
+   use:"Primer paso para obtener Azúcar Procesada. Líquido dulce alienígena extraído del Echinocactus (tarda 16h en crecer). Necesita un segundo procesado para convertirse en azúcar. Paso obligatorio de la cadena del Estrellador.",slots:1},
+  {cat:"basico",color:"#00e5d4",tier:"Básica",
+   title:"Néctar de Cactus → Azúcar Procesada",
+   ing:[{n:"Néctar de Cactus",q:"×1"}],res:"Azúcar Procesada ×1",
+   use:"Endulzante galáctico refinado. Es ingrediente tanto del <strong>Dónut Lumpen</strong> como de las <strong>Natillas Estelares</strong>. Es el azúcar base de todas las recetas dulces del procesador. Sin ella no puedes hacer El Estrellador.",slots:1},
+
+  {cat:"cadena",color:"#64b5f6",tier:"Cadena Láctea",
+   title:"Leche Fresca → Nata",
+   ing:[{n:"Leche Fresca",q:"×1"}],res:"Nata ×1",
+   use:"Primer paso de la cadena láctea para El Estrellador. La Leche Fresca la producen animales domesticados herbívoros grandes (vacas alienígenas). <strong>Sin animales con leche no puedes hacer El Estrellador</strong>. La nata se usa para Mantequilla y Natillas.",slots:1},
+  {cat:"cadena",color:"#64b5f6",tier:"Cadena Láctea",
+   title:"Nata + Nata → Mantequilla Batida",
+   ing:[{n:"Nata",q:"×1"},{n:"Nata",q:"×1"}],res:"Mantequilla Batida ×1",
+   use:"Segundo paso de la cadena láctea. Necesitas <strong>dos lotes de nata</strong> en las dos ranuras del procesador a la vez. La mantequilla batida se usa en el siguiente paso para hacer Aceite Aclarado, ingrediente del Dónut Lumpen.",slots:2},
+  {cat:"cadena",color:"#64b5f6",tier:"Cadena Láctea",
+   title:"Mantequilla + Mantequilla → Aceite Aclarado",
+   ing:[{n:"Mantequilla Batida",q:"×1"},{n:"Mantequilla Batida",q:"×1"}],res:"Aceite Aclarado ×1",
+   use:"Tercer y último paso de la cadena láctea. Necesitas <strong>dos lotes de Mantequilla Batida</strong> simultáneamente. El Aceite Aclarado es ingrediente clave del <strong>Dónut Lumpen</strong>. Este proceso convierte la grasa láctea en aceite puro de cocina.",slots:2},
+
+  {cat:"cebo",color:"#ffb74d",tier:"Cebo Herbívoro",
+   title:"Hecesio + Carne de Cactus → Cebo Herbívoro I",
+   ing:[{n:"Hecesio",q:"×1"},{n:"Carne de Cactus",q:"×1"}],res:"Cebo Herbívoro Avanzado ×1",
+   use:"Domestica completamente animales herbívoros tipo I. Una vez domesticado puedes <strong>montarlo si es grande</strong>, <strong>adoptarlo como mascota permanente</strong> y obtener sus productos (leche, lana, huevos). Esencial para conseguir Leche Fresca para El Estrellador.",slots:2},
+  {cat:"cebo",color:"#ffb74d",tier:"Cebo Herbívoro",
+   title:"Hecesio + Bulbo de Médula → Cebo Herbívoro II",
+   ing:[{n:"Hecesio",q:"×1"},{n:"Bulbo de Médula",q:"×1"}],res:"Cebo Herbívoro Avanzado ×1",
+   use:"Segunda variante de cebo herbívoro avanzado. Pruébalo si el Cebo Herbívoro I no funciona con el animal. <strong>Cada especie acepta solo un tipo específico de cebo</strong>. El Bulbo de Médula le da un sabor más terroso al cebo.",slots:2},
+  {cat:"cebo",color:"#ffb74d",tier:"Cebo Herbívoro",
+   title:"Hecesio + Hecesio → Cebo Herbívoro III",
+   ing:[{n:"Hecesio",q:"×1"},{n:"Hecesio",q:"×1"}],res:"Cebo Herbívoro Concentrado ×1",
+   use:"Cebo herbívoro de doble concentración. Para herbívoros exóticos de planetas raros que requieren un cebo más intenso. Si los dos primeros tipos no funcionan, prueba con este concentrado de Hecesio puro.",slots:2},
+  {cat:"cebo",color:"#f48fb1",tier:"Cebo Carnívoro",
+   title:"Mordita + Trozos de Diplo → Cebo Carnívoro I",
+   ing:[{n:"Mordita",q:"×1"},{n:"Trozos de Diplo",q:"×1"}],res:"Cebo Carnívoro Avanzado ×1",
+   use:"Domestica completamente animales carnívoros tipo I. Los Trozos de Diplo se obtienen matando Diplos o en el mercado. Una vez domesticado el carnívoro, puedes montarlo o adoptarlo y obtener sus productos (carne, fluidos especiales, materiales raros).",slots:2},
+  {cat:"cebo",color:"#f48fb1",tier:"Cebo Carnívoro",
+   title:"Mordita + Protosalchicha → Cebo Carnívoro II",
+   ing:[{n:"Mordita",q:"×1"},{n:"Protosalchicha",q:"×1"}],res:"Cebo Carnívoro Avanzado ×1",
+   use:"Segunda variante de cebo carnívoro. La Protosalchicha es carne prealienígena procesada. Si el carnívoro no acepta el tipo I, prueba este. Funciona especialmente bien con depredadores medianos de planetas tóxicos.",slots:2},
+  {cat:"cebo",color:"#f48fb1",tier:"Cebo Carnívoro",
+   title:"Mordita + Saco de Vísceras → Cebo Carnívoro III",
+   ing:[{n:"Mordita",q:"×1"},{n:"Saco de Vísceras",q:"×1"}],res:"Cebo Carnívoro Avanzado ×1",
+   use:"Tercera variante. El Saco de Vísceras se obtiene de criaturas muertas en planetas peligrosos. Para depredadores grandes de planetas abrasados o volcánicos que necesitan cebos más crudos y potentes.",slots:2},
+
+  {cat:"cocina",color:"#b388ff",tier:"Cocina Tier 3",
+   title:"Levadura + Granos + Azúcar → Masa",
+   ing:[{n:"Levadura Silvestre",q:"×1"},{n:"Granos de Vidrio",q:"×1"},{n:"Azúcar Procesada",q:"×1"}],res:"Masa ×1",
+   use:"Base panificable galáctica. La Masa es el ingrediente principal del <strong>Dónut Lumpen</strong>. Requiere los tres ingredientes a la vez en las <strong>3 ranuras del procesador</strong> simultáneamente. Sin Masa no puedes hacer El Estrellador.",slots:3},
+  {cat:"cocina",color:"#b388ff",tier:"Cocina Tier 4",
+   title:"Masa + Aceite Aclarado + Azúcar → Dónut Lumpen",
+   ing:[{n:"Masa",q:"×1"},{n:"Aceite Aclarado",q:"×1"},{n:"Azúcar Procesada",q:"×1"}],res:"Dónut Lumpen ×1",
+   use:"Postre alienígena frito en aceite galáctico. Es el <strong>primer componente final del Estrellador</strong>. Por sí solo se puede vender o consumir para buffs menores de exploración. Para El Estrellador necesitas combinarlo con Natillas Estelares.",slots:3},
+  {cat:"cocina",color:"#b388ff",tier:"Cocina Tier 4",
+   title:"Huevos Silicio + Nata + Azúcar → Natillas Estelares",
+   ing:[{n:"Huevos de Silicio",q:"×1"},{n:"Nata",q:"×1"},{n:"Azúcar Procesada",q:"×1"}],res:"Natillas Estelares ×1",
+   use:"Postre cremoso de origen cósmico con aroma a cosmos. Es el <strong>segundo componente final del Estrellador</strong>. Por sí solas se venden bien en los mercados galácticos. Al consumirlas directamente dan un buff temporal al Visor de Análisis.",slots:3},
+
+  {cat:"estrella",color:"#ffc844",tier:"⭐ El Estrellador",
+   title:"⭐ Dónut Lumpen + Natillas Estelares → EL ESTRELLADOR",
+   ing:[{n:"Dónut Lumpen",q:"×1"},{n:"Natillas Estelares",q:"×1"}],res:"⭐ El Estrellador ×1",
+   use:"El consumible definitivo de NMS. Al usarlo <strong>mejora permanentemente tu multiherramienta</strong> (más daño y velocidad de minado). También puedes <strong>refinarlo para obtener cientos de Nanitos</strong> o <strong>venderlo por millones de Unidades</strong>. Un stack de 100 puede transformar completamente tu economía. La receta más difícil pero la más rentable del juego.",slots:2},
+
+  {cat:"comercio",color:"#ffc844",tier:"Comercio",
+   title:"Azúcar Procesada + Nata → Dulce Alienígena",
+   ing:[{n:"Azúcar Procesada",q:"×1"},{n:"Nata",q:"×1"}],res:"Dulce Alienígena ×1",
+   use:"Golosina galáctica de valor comercial moderado. Los Korvax la coleccionan. Se vende en sistemas con <strong>economía de ocio</strong> o en la Anomalía Espacial. También sirve como ingrediente en recetas avanzadas de cocina galáctica.",slots:2},
+  {cat:"comercio",color:"#ffc844",tier:"Comercio",
+   title:"Huevos de Silicio + Azúcar → Proteína Dulce",
+   ing:[{n:"Huevos de Silicio",q:"×1"},{n:"Azúcar Procesada",q:"×1"}],res:"Proteína Dulce ×1",
+   use:"Suplemento proteico galáctico vendible en terminales de comercio. Al consumirlo da un buff temporal que mejora la eficiencia del <strong>Visor de Análisis</strong> (más unidades por escaneo de fauna y flora durante 3 minutos).",slots:2},
+  {cat:"comercio",color:"#ffc844",tier:"Comercio",
+   title:"Hecesio + Mordita → Cebo de Intercambio",
+   ing:[{n:"Hecesio",q:"×1"},{n:"Mordita",q:"×1"}],res:"Cebo de Intercambio ×1",
+   use:"Producto de comercio moderadamente valioso. Se puede vender en terminales de comercio galáctico o usar con comerciantes ambulantes para obtener <strong>mejores precios en el intercambio</strong>. Los Gek lo aprecian especialmente.",slots:2},
+];
+
+function drawNP(cat){
+  const g=document.getElementById('npg');
+  const d=cat==='all'?NP:NP.filter(x=>x.cat===cat);
+  g.innerHTML=d.map(item=>{
+    const ings=item.ing.map((r,i)=>`<span class="npi"><b>${r.n}</b> <span style="color:var(--gold)">${r.q}</span></span>${i<item.ing.length-1?'<span class="npa">+</span>':''}`).join('');
+    return`<div class="npc">
+      <div class="nph">
+        <div class="dot" style="background:${item.color}"></div>
+        <h4>${item.title}</h4>
+        <span class="nptier" style="background:${item.color}22;color:${item.color};border:1px solid ${item.color}44">${item.tier}</span>
+      </div>
+      <div class="npb">
+        <div class="npr">${ings}<span class="npa">→</span><span class="npres">${item.res}</span></div>
+        <div class="npu">📋 <strong>Para qué sirve:</strong> ${item.use}</div>
+        <div class="nps">🔲 Ranuras necesarias: <strong style="color:var(--cyan)">${item.slots}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+drawNP('all');
+
+document.getElementById('npf').addEventListener('click',e=>{
+  const b=e.target.closest('.nfb');if(!b)return;
+  document.querySelectorAll('.nfb').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');drawNP(b.dataset.c);
 });
-searchEl.addEventListener('keydown',e=>{
-  const items=autoEl.querySelectorAll('.autocomplete-item');
-  if(e.key==='ArrowDown'){acIdx=Math.min(acIdx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===acIdx));}
-  else if(e.key==='ArrowUp'){acIdx=Math.max(acIdx-1,-1);items.forEach((el,i)=>el.classList.toggle('active',i===acIdx));}
-  else if(e.key==='Enter'&&acIdx>=0&&items[acIdx]){const v=items[acIdx].dataset.v;searchEl.value=v;autoEl.classList.remove('show');doSearch(v);clearBtn.style.display='block';}
-  else if(e.key==='Escape'){autoEl.classList.remove('show');}
-});
-autoEl.addEventListener('click',e=>{
-  const item=e.target.closest('.autocomplete-item');
-  if(!item)return;
-  searchEl.value=item.dataset.v;autoEl.classList.remove('show');doSearch(item.dataset.v);clearBtn.style.display='block';
-});
-clearBtn.addEventListener('click',()=>{searchEl.value='';clearBtn.style.display='none';autoEl.classList.remove('show');showHint();hdrEl.style.display='none';searchEl.focus();});
-document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))autoEl.classList.remove('show');});
 </script>
 </body>
 </html>
